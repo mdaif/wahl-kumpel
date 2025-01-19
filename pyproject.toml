@@ -4,4 +4,11 @@ version = "0.1.0"
 description = "An assistant to answer urging questions on the parties running for German elections"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "faiss-cpu>=1.9.0.post1",
+    "langchain>=0.3.14",
+    "langchain-community>=0.3.14",
+    "langchain-openai>=0.3.0",
+    "langchainhub>=0.1.21",
+    "pypdf>=5.1.0",
+]
