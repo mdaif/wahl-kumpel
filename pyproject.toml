@@ -11,4 +11,5 @@ dependencies = [
     "langchain-openai>=0.3.0",
     "langchainhub>=0.1.21",
     "pypdf>=5.1.0",
+    "ruff>=0.9.2",
 ]

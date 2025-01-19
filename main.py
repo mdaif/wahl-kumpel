@@ -13,7 +13,9 @@ def main():
     loader = PyPDFLoader(file_path=pdf_path)
     documents = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000, chunk_overlap=100, separators=["\n\n","\n"," ",""],
+        chunk_size=1000,
+        chunk_overlap=100,
+        separators=["\n\n", "\n", " ", ""],
     )
     docs = text_splitter.split_documents(documents=documents)
 
