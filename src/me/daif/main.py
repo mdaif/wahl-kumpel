@@ -2,7 +2,10 @@ from fastapi import FastAPI
 
 from me.daif.agent.kumpel import answer_question
 from me.daif.agent.language import SupportedLanguage
-from me.daif.agent.response_schema import SuggestedQuestionResponse
+from me.daif.agent.response_schema import (
+    SuggestedQuestionResponse,
+    most_important_topics_parser,
+)
 
 app = FastAPI()
 
@@ -59,6 +62,21 @@ async def suggest_predefined_questions(
                     "stellen könnte, um eine fundierte Entscheidung darüber zu treffen, wen ich wählen soll?",
                 ]
             )
+
+
+@app.get("/most-important-topics")
+async def most_important_topics(
+    count: int = 10, language: SupportedLanguage = SupportedLanguage.english
+):
+    question = f"""
+        What is the most important {count} common topics among all parties ?
+        I want a list of items like healthcare, pension, .. etc
+        Answer in the {language} language.
+        Provide the output in the following JSON format:
+        {most_important_topics_parser.get_format_instructions()}
+    """
+    answer = await answer_question(question)
+    return most_important_topics_parser.parse(answer)
 
 
 @app.get("/answer-question")
