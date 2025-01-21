@@ -13,8 +13,8 @@ from langchain_community.vectorstores import FAISS
 FAISS_INDEX_NAME = "local.db"
 
 
-def answer_question(question: str) -> str:
-    vectorstore = _load_vectorstore()
+async def answer_question(question: str) -> str:
+    vectorstore = await _load_vectorstore()
 
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
     combine_docs_chain = create_stuff_documents_chain(
@@ -25,12 +25,16 @@ def answer_question(question: str) -> str:
         search_kwargs={"k": 30, "fetch_k": 60, "lambda_mult": 0.5},
     )
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
+    question = f"""
+        {question}
+        Please provide your answer in the language of the question.
+    """
     response = retrieval_chain.invoke({"input": question})
     answer = response["answer"]
     return answer
 
 
-def _load_vectorstore() -> FAISS:
+async def _load_vectorstore() -> FAISS:
     embeddings = OpenAIEmbeddings()
 
     if os.path.isdir(FAISS_INDEX_NAME):
