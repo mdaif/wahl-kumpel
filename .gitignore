@@ -10,3 +10,4 @@ wheels/
 .venv
 .idea/
 /local.db/
+src/wahl_kumpel.egg-info

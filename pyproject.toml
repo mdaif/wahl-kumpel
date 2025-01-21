@@ -14,3 +14,9 @@ dependencies = [
     "pypdf>=5.1.0",
     "ruff>=0.9.2",
 ]
+[project.scripts]
+wahl-kumpel = "me.daif.main:main"
+
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -1020,7 +1020,7 @@ wheels = [
 [[package]]
 name = "wahl-kumpel"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "faiss-cpu" },
     { name = "ipdb" },
