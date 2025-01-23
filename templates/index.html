@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wahlkumpel</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #fafafa;
+    }
+    h1 {
+      text-align: center;
+      margin: 1em 0;
+      color: #000;
+    }
+    .language-bar {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    .carousel-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 900px;
+      margin: 0 auto 2em auto;
+    }
+    .carousel-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 0.5em 1em;
+      cursor: pointer;
+      font-size: 1.2em;
+      margin: 0 0.5em;
+    }
+    .carousel-track {
+      display: flex;
+      overflow: hidden;
+      width: 700px;
+    }
+    .flip-card {
+      background: transparent;
+      width: 220px;
+      height: 260px;
+      margin: 0 0.5em;
+      perspective: 1000px;
+      flex-shrink: 0;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front,
+    .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      padding: 1em;
+    }
+    .flip-card-front {
+      background-color: #d80000; /* Red */
+      color: #fff;
+    }
+    .flip-card-back {
+      background-color: #ffcc00; /* Gold */
+      color: #000;
+      transform: rotateY(180deg);
+    }
+    /* Chatbot Styles */
+    .chat-container {
+      width: 400px;
+      margin: 0 auto 2em auto;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+    }
+    .chat-header {
+      background: #000000; /* Black */
+      color: #ffffff;
+      padding: 1em;
+      text-align: center;
+      font-size: 1.2em;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 1em;
+      overflow-y: auto;
+    }
+    .message {
+      margin: 0.5em 0;
+      max-width: 80%;
+      line-height: 1.4;
+      padding: 0.6em 1em;
+      border-radius: 10px;
+      display: inline-block;
+      clear: both;
+    }
+    .user-message {
+      background: #d80000; /* Red */
+      color: #ffffff;
+      float: right;
+      text-align: right;
+    }
+    .bot-message {
+      background: #ffcc00; /* Gold */
+      color: #000000;
+      float: left;
+      text-align: left;
+    }
+    .chat-input {
+      display: flex;
+      border-top: 3px solid #000000;
+    }
+    .chat-input input {
+      flex: 1;
+      border: none;
+      padding: 1em;
+      outline: none;
+      font-size: 1em;
+    }
+    .chat-input button {
+      background: #000000;
+      color: #ffffff;
+      border: none;
+      padding: 1em 1.2em;
+      cursor: pointer;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Wahlkumpel</h1>
+
+<!-- Language Selector -->
+<div class="language-bar">
+  <label for="langSelector">Language:</label>
+  <select id="langSelector" onchange="changeLanguage()">
+    <option value="en" selected>English</option>
+    <option value="de">Deutsch</option>
+  </select>
+</div>
+
+<!-- Carousel -->
+<div class="carousel-container">
+  <button class="carousel-btn" onclick="prevCard()">&laquo;</button>
+  <div class="carousel-track" id="carouselTrack"></div>
+  <button class="carousel-btn" onclick="nextCard()">&raquo;</button>
+</div>
+
+<!-- Chatbot -->
+<div class="chat-container">
+  <div class="chat-header" id="chatHeader">Ask me!</div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <!-- Wrap input + button in a form so Enter triggers 'submit' -->
+  <form class="chat-input" onsubmit="sendMessage(); return false;">
+    <input type="text" id="userInput" placeholder="Type your question..." />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<script>
+  /* --- Basic Carousel Logic --- */
+  const carouselTrack = document.getElementById('carouselTrack');
+  let currentIndex = 0;
+  const cardWidth = 220 + 16; // card + approximate margin
+
+  function nextCard() {
+    currentIndex++;
+    carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+  }
+
+  function prevCard() {
+    currentIndex = Math.max(0, currentIndex - 1);
+    carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+  }
+
+  /* --- Chatbot Logic --- */
+  const chatMessages = document.getElementById('chatMessages');
+  const userInput = document.getElementById('userInput');
+
+  function addMessage(text, isUser = false) {
+    const msg = document.createElement('div');
+    msg.classList.add('message', isUser ? 'user-message' : 'bot-message');
+    msg.textContent = text;
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function sendMessage() {
+    const userText = userInput.value.trim();
+    if (!userText) return;
+    addMessage(userText, true);
+    userInput.value = '';
+
+    // Mock AI response after short delay
+    setTimeout(() => {
+      const mockResponse = `This is a placeholder response about "${userText}".`;
+      addMessage(mockResponse);
+    }, 800);
+  }
+
+  /* --- Topic Card Click Handler --- */
+  function topicClicked(topicText) {
+    userInput.value = topicText;
+    sendMessage();
+  }
+
+  /* --- Fetch topics dynamically (Same-domain API) --- */
+  fetch("/topics")
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(item => {
+        const flipCard = document.createElement('div');
+        flipCard.className = 'flip-card';
+        flipCard.innerHTML = `
+          <div class="flip-card-inner" onclick="topicClicked('${item.title}')">
+            <div class="flip-card-front">
+              <h3>${item.frontText}</h3>
+              <p>${item.title}</p>
+            </div>
+            <div class="flip-card-back">
+              <p>${item.backText}</p>
+            </div>
+          </div>
+        `;
+        carouselTrack.appendChild(flipCard);
+      });
+    })
+    .catch(err => console.error('Error fetching topics:', err));
+
+  /* --- Language Switcher --- */
+  function changeLanguage() {
+    const selectedLang = document.getElementById('langSelector').value;
+    const chatHeader = document.getElementById('chatHeader');
+    const userInput = document.getElementById('userInput');
+    if (selectedLang === 'en') {
+      chatHeader.textContent = "Ask me!";
+    } else if (selectedLang === 'de') {
+      chatHeader.textContent = "Frag mich!";
+      userInput.placeholder = "Tippe deine Frage..."
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from starlette.responses import HTMLResponse
+from starlette.templating import Jinja2Templates
 
 from me.daif.agent.kumpel import answer_question
 from me.daif.agent.language import SupportedLanguage
@@ -8,11 +10,20 @@ from me.daif.agent.response_schema import (
 )
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/health")
 async def health():
     return {"status": "OK"}
+
+
+@app.get("/", response_class=HTMLResponse)
+async def read_item(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+    )
 
 
 @app.get("/suggest-predefined-questions")
