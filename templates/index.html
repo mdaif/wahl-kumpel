@@ -2,64 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Wahlkumpel</title>
+  <title>Compact Carousel + 30px Padding + Spinner + Chat + Language</title>
+
+  <!-- Minimal reset and basic styling for demonstration -->
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: #fafafa;
-    }
-    h1 {
+    /* Container for everything above chat */
+    .header-container {
       text-align: center;
       margin: 1em 0;
-      color: #000;
     }
+
+    /* --- Language Selector --- */
     .language-bar {
-      text-align: center;
       margin-bottom: 1em;
     }
+
+    /********************************************
+     * Carousel Container
+     ********************************************/
+    /* Increased to 1100×460 so we can have 30px
+       padding on all sides around 900×260 card space */
     .carousel-container {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      max-width: 900px;
-      margin: 0 auto 2em auto;
+      position: relative;
+      width: 1100px; /* 900 inner space + 30px left + 30px right */
+      height: 460px; /* 260 card height + 30 top + 30 bottom */
+      margin: 0 auto 2em;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      overflow: hidden;
     }
+
+    /* The track fills the container,
+       and we'll add 30px padding for the white space around the cards */
+    .carousel-track {
+      width: 100%;
+      height: 70%;
+      display: flex; /* horizontal layout */
+      align-items: center;
+      justify-content: flex-start; /* we'll shift them with transform if we have multiple cards */
+      transition: transform 0.5s ease;
+      /* Here’s the key: 30px padding on each side (top, right, bottom, left) */
+      padding-top: 90px;
+      padding-bottom: 10px;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* --- Spinner (large circle) in the center of the carousel --- */
+    .spinner-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none; /* toggled via JS */
+      text-align: center;
+      z-index: 20;
+    }
+    .spinner {
+      width: 64px;
+      height: 64px;
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #d80000;
+      border-radius: 50%;
+      margin: 0 auto;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /********************************************
+     * Carousel Buttons
+     ********************************************/
     .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
       background: #000;
       color: #fff;
       border: none;
-      padding: 0.5em 1em;
+      font-size: 1.2rem;
       cursor: pointer;
-      font-size: 1.2em;
-      margin: 0 0.5em;
+      padding: 0.5rem 1rem;
     }
-    .carousel-track {
-      display: flex;
-      overflow: hidden;
-      width: 700px;
+    .carousel-btn.left {
+      left: 1rem;
     }
+    .carousel-btn.right {
+      right: 1rem;
+    }
+
+    /********************************************
+     * Flip Cards
+     ********************************************/
     .flip-card {
-      background: transparent;
       width: 220px;
       height: 260px;
-      margin: 0 0.5em;
+      margin: 0 1rem;
       perspective: 1000px;
       flex-shrink: 0;
     }
+
     .flip-card-inner {
       position: relative;
       width: 100%;
       height: 100%;
-      text-align: center;
       transition: transform 0.8s;
       transform-style: preserve-3d;
       cursor: pointer;
     }
-    .flip-card:hover .flip-card-inner {
-      transform: rotateY(180deg);
-    }
+
     .flip-card-front,
     .flip-card-back {
       position: absolute;
@@ -68,137 +122,179 @@
       backface-visibility: hidden;
       border-radius: 8px;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-      padding: 1em;
+      text-align: center;
+      padding: 1rem;
     }
+
     .flip-card-front {
-      background-color: #d80000; /* Red */
-      color: #fff;
+      background-color: #ffcc00; /* Yellow */
+      color: #000;
     }
     .flip-card-back {
-      background-color: #ffcc00; /* Gold */
-      color: #000;
+      background-color: #d80000; /* Red */
+      color: #fff;
       transform: rotateY(180deg);
     }
-    /* Chatbot Styles */
+
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    /********************************************
+     * Chat Window
+     ********************************************/
     .chat-container {
-      width: 400px;
-      margin: 0 auto 2em auto;
-      background: #ffffff;
+      width: 1100px;
+      margin: 0 auto;
+      background: #fff;
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       display: flex;
       flex-direction: column;
-      height: 600px;
+      height: 500px;
     }
     .chat-header {
-      background: #000000; /* Black */
-      color: #ffffff;
-      padding: 1em;
+      background: #000;
+      color: #fff;
+      padding: 1rem;
       text-align: center;
-      font-size: 1.2em;
+      font-size: 1.2rem;
     }
     .chat-messages {
       flex: 1;
-      padding: 1em;
+      padding: 1rem;
       overflow-y: auto;
     }
     .message {
-      margin: 0.5em 0;
+      margin: 0.5rem 0;
       max-width: 80%;
       line-height: 1.4;
-      padding: 0.6em 1em;
+      padding: 0.6rem 1rem;
       border-radius: 10px;
       display: inline-block;
       clear: both;
     }
     .user-message {
-      background: #d80000; /* Red */
-      color: #ffffff;
+      background: #d80000; /* Red bubble */
+      color: #fff;
       float: right;
       text-align: right;
     }
     .bot-message {
-      background: #ffcc00; /* Gold */
-      color: #000000;
+      background: #ffcc00; /* Gold bubble */
+      color: #000;
       float: left;
       text-align: left;
     }
     .chat-input {
       display: flex;
-      border-top: 3px solid #000000;
+      border-top: 3px solid #000;
     }
     .chat-input input {
       flex: 1;
       border: none;
-      padding: 1em;
+      padding: 1rem;
       outline: none;
-      font-size: 1em;
+      font-size: 1rem;
     }
     .chat-input button {
-      background: #000000;
-      color: #ffffff;
+      background: #000;
+      color: #fff;
       border: none;
-      padding: 1em 1.2em;
+      padding: 1rem 1.2rem;
       cursor: pointer;
-      font-size: 1em;
+      font-size: 1rem;
     }
   </style>
 </head>
 <body>
 
-<h1>Wahlkumpel</h1>
+<div class="header-container">
+  <h1>Compact Carousel + 30px Padding + Chat + Language</h1>
 
-<!-- Language Selector -->
-<div class="language-bar">
-  <label for="langSelector">Language:</label>
-  <select id="langSelector" onchange="changeLanguage()">
-    <option value="en" selected>English</option>
-    <option value="de">Deutsch</option>
-  </select>
+  <!-- Language Selector -->
+  <div class="language-bar">
+    <label for="langSelector">Language:</label>
+    <select id="langSelector" onchange="fetchTopics()">
+      <option value="English" selected>English</option>
+      <option value="German">Deutsch</option>
+    </select>
+  </div>
 </div>
 
-<!-- Carousel -->
+<!-- Carousel Container (1100×460) -->
 <div class="carousel-container">
-  <button class="carousel-btn" onclick="prevCard()">&laquo;</button>
+  <!-- Spinner overlay -->
+  <div class="spinner-container" id="spinnerContainer">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Left arrow button -->
+  <button class="carousel-btn left" onclick="prevCard()">&laquo;</button>
+
+  <!-- Carousel track (30px padding for all sides) -->
   <div class="carousel-track" id="carouselTrack"></div>
-  <button class="carousel-btn" onclick="nextCard()">&raquo;</button>
+
+  <!-- Right arrow button -->
+  <button class="carousel-btn right" onclick="nextCard()">&raquo;</button>
 </div>
 
-<!-- Chatbot -->
+<!-- Chat Container -->
 <div class="chat-container">
   <div class="chat-header" id="chatHeader">Ask me!</div>
   <div class="chat-messages" id="chatMessages"></div>
-  <!-- Wrap input + button in a form so Enter triggers 'submit' -->
   <form class="chat-input" onsubmit="sendMessage(); return false;">
     <input type="text" id="userInput" placeholder="Type your question..." />
-    <button type="submit">Send</button>
+    <button type="submit" id="submitButton">Send</button>
   </form>
 </div>
 
 <script>
-  /* --- Basic Carousel Logic --- */
+  /************************************************************
+   * 1. Carousel + Flip Cards Logic
+   ************************************************************/
+  let currentIndex = 0;         // which "page" of cards
+  let cardWidth = 0;           // measured after loading one card
+  let totalCards = 0;
   const carouselTrack = document.getElementById('carouselTrack');
-  let currentIndex = 0;
-  const cardWidth = 220 + 16; // card + approximate margin
+  const spinnerContainer = document.getElementById('spinnerContainer');
+
+  function updateTransform() {
+    const visibleCards = 3.5;
+    const maxIndex = Math.floor(totalCards - visibleCards);
+    currentIndex = Math.min(currentIndex, maxIndex);
+    currentIndex = Math.max(0, currentIndex);
+
+    carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+
+    // Add some space at the right side
+    if (currentIndex === maxIndex) {
+      carouselTrack.style.paddingRight = '50px';  // Space after last card
+    } else {
+      carouselTrack.style.paddingRight = '0';
+    }
+  }
 
   function nextCard() {
     currentIndex++;
-    carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+    updateTransform();
   }
 
   function prevCard() {
-    currentIndex = Math.max(0, currentIndex - 1);
-    carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+    currentIndex--;
+    updateTransform();
   }
 
-  /* --- Chatbot Logic --- */
+  /************************************************************
+   * 2. Chat Logic
+   ************************************************************/
   const chatMessages = document.getElementById('chatMessages');
   const userInput = document.getElementById('userInput');
+  const submitButton = document.getElementById('submitButton');
 
   function addMessage(text, isUser = false) {
     const msg = document.createElement('div');
@@ -214,54 +310,97 @@
     addMessage(userText, true);
     userInput.value = '';
 
-    // Mock AI response after short delay
+    // Simulate a bot reply
     setTimeout(() => {
-      const mockResponse = `This is a placeholder response about "${userText}".`;
+      const mockResponse = `Placeholder about "${userText}"`;
       addMessage(mockResponse);
     }, 800);
   }
 
-  /* --- Topic Card Click Handler --- */
-  function topicClicked(topicText) {
-    userInput.value = topicText;
+  /************************************************************
+   * 3. Language Switcher (Chat Header)
+   ************************************************************/
+  const chatHeader = document.getElementById('chatHeader');
+  function changeChatHeader(lang) {
+    if (lang === 'English') {
+      chatHeader.textContent = "Ask me!";
+      userInput.placeholder = "Type your question";
+      submitButton.innerText = "Send";
+    }
+    else if (lang === 'German') {
+      chatHeader.textContent = "Frag mich!";
+      userInput.placeholder = "Gib deine Frage ein";
+      submitButton.innerText = "Sende";
+    }
+  }
+
+  /************************************************************
+   * 4. Fetch Topics by Language
+   ************************************************************/
+  function topicClicked(backText) {
+    // On flip-card click, send backText to the chat
+    userInput.value = backText;
+    window.scrollTo(0, document.body.scrollHeight);
     sendMessage();
   }
 
-  /* --- Fetch topics dynamically (Same-domain API) --- */
-  fetch("/topics")
-    .then(res => res.json())
-    .then(data => {
-      data.forEach(item => {
-        const flipCard = document.createElement('div');
-        flipCard.className = 'flip-card';
-        flipCard.innerHTML = `
-          <div class="flip-card-inner" onclick="topicClicked('${item.title}')">
-            <div class="flip-card-front">
-              <h3>${item.frontText}</h3>
-              <p>${item.title}</p>
-            </div>
-            <div class="flip-card-back">
-              <p>${item.backText}</p>
-            </div>
-          </div>
-        `;
-        carouselTrack.appendChild(flipCard);
-      });
-    })
-    .catch(err => console.error('Error fetching topics:', err));
+  function fetchTopics() {
+    const lang = document.getElementById('langSelector').value;
+    changeChatHeader(lang);
 
-  /* --- Language Switcher --- */
-  function changeLanguage() {
-    const selectedLang = document.getElementById('langSelector').value;
-    const chatHeader = document.getElementById('chatHeader');
-    const userInput = document.getElementById('userInput');
-    if (selectedLang === 'en') {
-      chatHeader.textContent = "Ask me!";
-    } else if (selectedLang === 'de') {
-      chatHeader.textContent = "Frag mich!";
-      userInput.placeholder = "Tippe deine Frage..."
-    }
+    // Show spinner, clear old
+    spinnerContainer.style.display = 'block';
+    carouselTrack.innerHTML = '';
+    currentIndex = 0;
+    totalCards = 0;
+
+    // e.g. /topics?language=German
+    const url = `/topics?language=${encodeURIComponent(lang)}`;
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        const topics = data.topics || [];
+        totalCards = topics.length;
+
+        // Build flip cards
+        topics.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'flip-card';
+          card.innerHTML = `
+            <div class="flip-card-inner" onclick="topicClicked('${item.backText}')">
+              <div class="flip-card-front">
+                <h5>${item.frontText}</h5>
+              </div>
+              <div class="flip-card-back">
+                <p>${item.backText}</p>
+              </div>
+            </div>
+          `;
+          carouselTrack.appendChild(card);
+        });
+      })
+      .catch(err => console.error('Error fetching topics:', err))
+      .finally(() => {
+        spinnerContainer.style.display = 'none';
+
+        // If we have at least one card, measure
+        const firstCard = carouselTrack.querySelector('.flip-card');
+        if (firstCard) {
+          const style = window.getComputedStyle(firstCard);
+          const baseWidth = firstCard.offsetWidth;
+          const marginLeft = parseFloat(style.marginLeft);
+          const marginRight = parseFloat(style.marginRight);
+          cardWidth = baseWidth + marginLeft + marginRight;
+        } else {
+          cardWidth = 240; // fallback
+        }
+        updateTransform();
+      });
   }
+
+  // Fetch topics once on page load
+  window.addEventListener('DOMContentLoaded', fetchTopics);
 </script>
 
 </body>

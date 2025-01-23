@@ -75,13 +75,16 @@ async def suggest_predefined_questions(
             )
 
 
-@app.get("/most-important-topics")
+@app.get("/topics")
 async def most_important_topics(
     count: int = 10, language: SupportedLanguage = SupportedLanguage.english
 ):
     question = f"""
         What is the most important {count} common topics among all parties ?
         I want a list of items like healthcare, pension, .. etc
+        For each item I want:
+        1. The item name (like healthcare, pension, ...etc).
+        2. description: A text that says: Compare between the stances of all parties on the <the item name from step 1>.
         Answer in the {language} language.
         Provide the output in the following JSON format:
         {most_important_topics_parser.get_format_instructions()}
