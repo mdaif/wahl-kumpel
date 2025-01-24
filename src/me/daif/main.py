@@ -84,19 +84,23 @@ async def most_important_topics(
         I want a list of items like healthcare, pension, .. etc
         For each item I want:
         1. The item name (like healthcare, pension, ...etc).
-        2. description: A text that says: Compare between the stances of all parties on the <the item name from step 1>.
-        Answer in the {language} language.
+        2. description: A text that says: Make a comparison between the stances of all parties on <the item name from step 1>.
+        Answer both points in the {language} language, and use friendly non-official tone.
         Provide the output in the following JSON format:
         {most_important_topics_parser.get_format_instructions()}
     """
-    answer = await answer_question(question)
+    answer = await answer_question(question, language)
     return most_important_topics_parser.parse(answer)
 
 
 @app.get("/answer-question")
-async def answer_user_question(
-    question: str, language: SupportedLanguage = SupportedLanguage.english
-):
+async def answer_user_question(question: str):
+    question = f"""
+    Answer the question: {question}
+    If the question does not provide enough context, assume it asks for comparison between the stances of all parties
+    on a the topic of the question. Your answer must include information about all the parties.
+    The language you write your answer in should be the same language of the question,  and use friendly non-official tone.
+    """
     return {
-        "answer": await answer_question(question, language),
+        "answer": await answer_question(question, None),
     }

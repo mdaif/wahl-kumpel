@@ -16,7 +16,7 @@ FAISS_INDEX_NAME = "local.db"
 
 
 async def answer_question(
-    question: str, language: SupportedLanguage = SupportedLanguage.english
+    question: str, language: SupportedLanguage | None = SupportedLanguage.english
 ) -> str:
     vectorstore = await _load_vectorstore()
 
@@ -29,10 +29,11 @@ async def answer_question(
         search_kwargs={"k": 30, "fetch_k": 60, "lambda_mult": 0.5},
     )
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
-    question = f"""
-        {question}
-        Please provide your answer in the {language} lanugage.
-    """
+    if language:
+        question = f"""
+            {question}
+            Please translate your answer in the {language} language.
+        """
     response = retrieval_chain.invoke({"input": question})
     answer = response["answer"]
     return answer

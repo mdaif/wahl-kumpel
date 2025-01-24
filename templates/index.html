@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Compact Carousel + 30px Padding + Spinner + Chat + Language</title>
+  <title>Wahlkumpel</title>
 
   <!-- Minimal reset and basic styling for demonstration -->
   <style>
@@ -214,7 +214,7 @@
 <body>
 
 <div class="header-container">
-  <h1>Compact Carousel + 30px Padding + Chat + Language</h1>
+  <h1 id="title">🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪</h1>
 
   <!-- Language Selector -->
   <div class="language-bar">
@@ -311,22 +311,32 @@ function sendMessage() {
   userInput.value = '';
 
   // Add the "sending..." message
+  const lang = document.getElementById('langSelector').value;
   const sendingMessage = document.createElement('div');
   sendingMessage.classList.add('message', 'bot-message');
-  sendingMessage.textContent = 'sending';
+    if (lang === 'English') {
+      sendingMessage.textContent = 'typing';
+    } else {
+      sendingMessage.textContent = 'schreibt';
+    }
+
   chatMessages.appendChild(sendingMessage);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
   // Add animated dots
   let dotCount = 0;
+
   const dotsInterval = setInterval(() => {
     dotCount = (dotCount + 1) % 4; // Loop through 0 to 3 dots
-    sendingMessage.textContent = 'typing' + '.'.repeat(dotCount);
+    if (lang === 'English') {
+      sendingMessage.textContent = 'typing' + '.'.repeat(dotCount);
+    } else {
+      sendingMessage.textContent = 'schreibt' + '.'.repeat(dotCount);
+    }
+
   }, 500);
 
   // Fetch the response from the server
-  const lang = document.getElementById('langSelector').value;
-
   fetch(`/answer-question?question=${encodeURIComponent(userText)},language=${encodeURIComponent(lang)}`)
     .then(res => res.json())
     .then(data => {
@@ -349,16 +359,19 @@ function sendMessage() {
    * 3. Language Switcher (Chat Header)
    ************************************************************/
   const chatHeader = document.getElementById('chatHeader');
+  const title = document.getElementById('title');
   function changeChatHeader(lang) {
     if (lang === 'English') {
       chatHeader.textContent = "Ask me!";
       userInput.placeholder = "Type your question";
       submitButton.innerText = "Send";
+      title.textContent = "🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪";
     }
     else if (lang === 'German') {
       chatHeader.textContent = "Frag mich!";
       userInput.placeholder = "Gib deine Frage ein";
       submitButton.innerText = "Sende";
+      title.textContent = "🇩🇪 🇩🇪 Wahlkumpel – dein freundlicher Helfer beim Lesen von Wahl-PDFs! 🇩🇪 🇩🇪";
     }
   }
 
