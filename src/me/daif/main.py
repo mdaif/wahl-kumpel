@@ -6,6 +6,7 @@ from me.daif.agent.kumpel import answer_question
 from me.daif.agent.language import SupportedLanguage
 from me.daif.agent.response_schema import (
     most_important_topics_parser,
+    structured_comparison_parser,
 )
 
 app = FastAPI()
@@ -62,7 +63,9 @@ async def answer_user_question(question: str):
     
     The language you write your answer in should be the same language of the question, and use friendly non-official 
     tone.
+    
+    If the question is about comparing the stances of different parties, Provide the output in the following JSON format:
+    {structured_comparison_parser.get_format_instructions()}
     """
-    return {
-        "answer": await answer_question(question, None),
-    }
+    answer = await answer_question(question, None)
+    return structured_comparison_parser.parse(answer)
