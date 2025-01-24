@@ -22,7 +22,14 @@ class StructuredComparisonAnswer(BaseModel):
     )
 
 
+class FreeTextAnswer(BaseModel):
+    free_text_answer: str = Field(
+        alias="freeTextAnswer", description="Free text answer"
+    )
+
+
 most_important_topics_parser = PydanticOutputParser(pydantic_object=MostImportantTopics)
 structured_comparison_parser = PydanticOutputParser(
     pydantic_object=StructuredComparisonAnswer
 )
+free_text_answer_parser = PydanticOutputParser(pydantic_object=FreeTextAnswer)
