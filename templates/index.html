@@ -20,49 +20,44 @@
     /********************************************
      * Carousel Container
      ********************************************/
-    /* Increased to 1100×460 so we can have 30px
-       padding on all sides around 900×260 card space */
     .carousel-container {
       position: relative;
-      width: 1042px; /* 900 inner space + 30px left + 30px right */
-      height: 375px; /* 260 card height + 30 top + 30 bottom */
+      width: 1042px;
+      height: 375px;
       margin: 0 auto 2em;
       border: 1px solid #ccc;
       box-sizing: border-box;
       overflow: hidden;
+      background-color: #f7f7f7;
     }
 
-    /* The track fills the container,
-       and we'll add 30px padding for the white space around the cards */
     .carousel-track {
       width: 100%;
       height: 70%;
-      display: flex; /* horizontal layout */
+      display: flex;
       align-items: center;
-      justify-content: flex-start; /* we'll shift them with transform if we have multiple cards */
+      justify-content: flex-start;
       transition: transform 0.5s ease;
-      /* Here’s the key: 30px padding on each side (top, right, bottom, left) */
       padding-top: 90px;
       padding-bottom: 10px;
       box-sizing: border-box;
       position: relative;
     }
 
-    /* --- Spinner (large circle) in the center of the carousel --- */
     .spinner-container {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      display: none; /* toggled via JS */
+      display: none;
       text-align: center;
       z-index: 20;
     }
     .spinner {
       width: 64px;
       height: 64px;
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #d80000;
+      border: 8px solid #e0e0e0;
+      border-top: 8px solid #6c757d;
       border-radius: 50%;
       margin: 0 auto;
       animation: spin 1s linear infinite;
@@ -72,20 +67,18 @@
       100% { transform: rotate(360deg); }
     }
 
-    /********************************************
-     * Carousel Buttons
-     ********************************************/
     .carousel-btn {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       z-index: 10;
-      background: #000;
+      background: #6c757d;
       color: #fff;
       border: none;
       font-size: 1.2rem;
       cursor: pointer;
       padding: 0.5rem 1rem;
+      border-radius: 4px;
     }
     .carousel-btn.left {
       left: 1rem;
@@ -124,18 +117,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
       text-align: center;
       padding: 1rem;
     }
 
     .flip-card-front {
-      background-color: #ffcc00; /* Yellow */
-      color: #000;
+      background-color: #dee2e6;
+      color: #343a40;
     }
     .flip-card-back {
-      background-color: #d80000; /* Red */
-      color: #fff;
+      background-color: #adb5bd;
+      color: #ffffff;
       transform: rotateY(180deg);
     }
 
@@ -149,7 +142,7 @@
     .chat-container {
       width: 1042px;
       margin: 0 auto;
-      background: #fff;
+      background: #ffffff;
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -158,8 +151,8 @@
       height: 500px;
     }
     .chat-header {
-      background: #000;
-      color: #fff;
+      background: #6c757d;
+      color: #ffffff;
       padding: 1rem;
       text-align: center;
       font-size: 1.2rem;
@@ -179,20 +172,20 @@
       clear: both;
     }
     .user-message {
-      background: #d80000; /* Red bubble */
-      color: #fff;
+      background: #6c757d;
+      color: #ffffff;
       float: right;
       text-align: right;
     }
     .bot-message {
-      background: #ffcc00; /* Gold bubble */
-      color: #000;
+      background: #dee2e6;
+      color: #343a40;
       float: left;
       text-align: left;
     }
     .chat-input {
       display: flex;
-      border-top: 3px solid #000;
+      border-top: 3px solid #6c757d;
     }
     .chat-input input {
       flex: 1;
@@ -202,8 +195,8 @@
       font-size: 1rem;
     }
     .chat-input button {
-      background: #000;
-      color: #fff;
+      background: #6c757d;
+      color: #ffffff;
       border: none;
       padding: 1rem 1.2rem;
       cursor: pointer;
@@ -226,7 +219,7 @@
   </div>
 </div>
 
-<!-- Carousel Container (1100×460) -->
+<!-- Carousel Container -->
 <div class="carousel-container">
   <!-- Spinner overlay -->
   <div class="spinner-container" id="spinnerContainer">
@@ -236,7 +229,7 @@
   <!-- Left arrow button -->
   <button class="carousel-btn left" onclick="prevCard()">&laquo;</button>
 
-  <!-- Carousel track (30px padding for all sides) -->
+  <!-- Carousel track -->
   <div class="carousel-track" id="carouselTrack"></div>
 
   <!-- Right arrow button -->
@@ -257,8 +250,8 @@
   /************************************************************
    * 1. Carousel + Flip Cards Logic
    ************************************************************/
-  let currentIndex = 0;         // which "page" of cards
-  let cardWidth = 0;           // measured after loading one card
+  let currentIndex = 0;
+  let cardWidth = 0;
   let totalCards = 0;
   const carouselTrack = document.getElementById('carouselTrack');
   const spinnerContainer = document.getElementById('spinnerContainer');
@@ -271,9 +264,8 @@
 
     carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
 
-    // Add some space at the right side
     if (currentIndex === maxIndex) {
-      carouselTrack.style.paddingRight = '50px';  // Space after last card
+      carouselTrack.style.paddingRight = '50px';
     } else {
       carouselTrack.style.paddingRight = '0';
     }
@@ -304,56 +296,40 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-function sendMessage() {
-  const userText = userInput.value.trim();
-  if (!userText) return;
-  addMessage(userText, true);
-  userInput.value = '';
+  function sendMessage() {
+    const userText = userInput.value.trim();
+    if (!userText) return;
+    addMessage(userText, true);
+    userInput.value = '';
 
-  // Add the "sending..." message
-  const lang = document.getElementById('langSelector').value;
-  const sendingMessage = document.createElement('div');
-  sendingMessage.classList.add('message', 'bot-message');
-    if (lang === 'English') {
-      sendingMessage.textContent = 'typing';
-    } else {
-      sendingMessage.textContent = 'schreibt';
-    }
+    const lang = document.getElementById('langSelector').value;
+    const sendingMessage = document.createElement('div');
+    sendingMessage.classList.add('message', 'bot-message');
+    sendingMessage.textContent = lang === 'English' ? 'typing' : 'schreibt';
 
-  chatMessages.appendChild(sendingMessage);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.appendChild(sendingMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // Add animated dots
-  let dotCount = 0;
+    let dotCount = 0;
+    const dotsInterval = setInterval(() => {
+      dotCount = (dotCount + 1) % 4;
+      sendingMessage.textContent = lang === 'English' ? `typing${'.'.repeat(dotCount)}` : `schreibt${'.'.repeat(dotCount)}`;
+    }, 500);
 
-  const dotsInterval = setInterval(() => {
-    dotCount = (dotCount + 1) % 4; // Loop through 0 to 3 dots
-    if (lang === 'English') {
-      sendingMessage.textContent = 'typing' + '.'.repeat(dotCount);
-    } else {
-      sendingMessage.textContent = 'schreibt' + '.'.repeat(dotCount);
-    }
-
-  }, 500);
-
-  // Fetch the response from the server
-  fetch(`/answer-question?question=${encodeURIComponent(userText)},language=${encodeURIComponent(lang)}`)
-    .then(res => res.json())
-    .then(data => {
-      clearInterval(dotsInterval); // Stop the animated dots
-      chatMessages.removeChild(sendingMessage); // Remove the "sending..." message
-      addMessage(data.answer); // Add the actual response
-    })
-    .catch(err => {
-      console.error(err);
-      clearInterval(dotsInterval); // Stop the animated dots
-      chatMessages.removeChild(sendingMessage); // Remove the "sending..." message
-      addMessage('Error fetching answer.'); // Show error message
-    });
-}
-
-
-
+    fetch(`/answer-question?question=${encodeURIComponent(userText)},language=${encodeURIComponent(lang)}`)
+      .then(res => res.json())
+      .then(data => {
+        clearInterval(dotsInterval);
+        chatMessages.removeChild(sendingMessage);
+        addMessage(data.answer);
+      })
+      .catch(err => {
+        console.error(err);
+        clearInterval(dotsInterval);
+        chatMessages.removeChild(sendingMessage);
+        addMessage('Error fetching answer.');
+      });
+  }
 
   /************************************************************
    * 3. Language Switcher (Chat Header)
@@ -379,7 +355,6 @@ function sendMessage() {
    * 4. Fetch Topics by Language
    ************************************************************/
   function topicClicked(backText) {
-    // On flip-card click, send backText to the chat
     userInput.value = backText;
     window.scrollTo(0, document.body.scrollHeight);
     sendMessage();
@@ -389,13 +364,11 @@ function sendMessage() {
     const lang = document.getElementById('langSelector').value;
     changeChatHeader(lang);
 
-    // Show spinner, clear old
     spinnerContainer.style.display = 'block';
     carouselTrack.innerHTML = '';
     currentIndex = 0;
     totalCards = 0;
 
-    // e.g. /topics?language=German
     const url = `/topics?language=${encodeURIComponent(lang)}`;
 
     fetch(url)
@@ -404,7 +377,6 @@ function sendMessage() {
         const topics = data.topics || [];
         totalCards = topics.length;
 
-        // Build flip cards
         topics.forEach(item => {
           const card = document.createElement('div');
           card.className = 'flip-card';
@@ -425,7 +397,6 @@ function sendMessage() {
       .finally(() => {
         spinnerContainer.style.display = 'none';
 
-        // If we have at least one card, measure
         const firstCard = carouselTrack.querySelector('.flip-card');
         if (firstCard) {
           const style = window.getComputedStyle(firstCard);
@@ -434,13 +405,12 @@ function sendMessage() {
           const marginRight = parseFloat(style.marginRight);
           cardWidth = baseWidth + marginLeft + marginRight;
         } else {
-          cardWidth = 240; // fallback
+          cardWidth = 240;
         }
         updateTransform();
       });
   }
 
-  // Fetch topics once on page load
   window.addEventListener('DOMContentLoaded', fetchTopics);
 </script>
 
