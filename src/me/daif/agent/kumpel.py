@@ -61,9 +61,8 @@ async def _load_vectorstore() -> FAISS:
                 documents.append(doc)
             print(f"Loaded {file}")
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500,
+        chunk_size=1000,
         chunk_overlap=200,
-        separators=["\n\n", "\n", ".", "!", "?"],
     )
     documents = text_splitter.split_documents(documents=documents)
     vectorstore = FAISS.from_documents(documents, embeddings)

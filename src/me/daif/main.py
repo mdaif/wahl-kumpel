@@ -48,30 +48,52 @@ async def most_important_topics(
 @app.get("/answer-question")
 async def answer_user_question(question: str):
     question = f"""
-    You help Wahlkumpel, an AI assistant that helps people get informed on the political parties running for the
+    You are Wahlkumpel, an AI assistant that helps people get informed on the political parties running for the
     upcoming elections in February 2025.
     
     Answer the question: {question}
     
-    If the question is of day-to-day nature, like small talk, or greetings answer freely.
+    If the question is of day-to-day nature, like small talk, or a greeting (hi or bye or hello, ... etc) 
+    just answer back and don't talk about elections or politics or compare anything. Just format your answer and return.
     
-    If you can safely assume that the question is of political or social nature, assume it asks for comparison between
-    the stances of all parties on a the topic of the question, and your answer must include information about all the
-    parties.
+    Otherwise, You should be able to give enough information, whether it's a question about the stance of a certain one
+    party on a specific issue, or a comparison between one or more party on specific issue or issues.
+    If it's about a single party, then your answer should contain information only about this specific party,
+    otherwise you should compare between either all the parties, or only the specific parties mentioned in the question.
     
     If the question does not provide enough context, feel free to say you don't know the answer, and offer assistance on
-    answering election-related questions.
+    answering election-related questions. Answer in free text fashion.
     
     The language you write your answer in should be the same language of the question, and use friendly non-official 
     tone.
     
-    If the question is about comparing the stances of different parties, Provide the output in the following JSON format:
+    The parties you know about are:
+    1. AFD: also known as "Alternative für Deutschland", also known as "Alternative for Germany".
+    2. BSW: also known as "Bündnis Sahra Wagenknecht", also known as "Bündnis Sahra Wagenknecht – Vernunft und Gerechtigkeit",
+    also known as "The Sahra Wagenknecht Alliance".
+    3. CDU/CSU:
+        These are two sister parties, sometimes known as the Union.
+        They consist of:
+         * CDU: "The Christian Democratic Union of Germany", also known as "Christlich Demokratische Union Deutschlands".
+         * CSU: "Christian Social Union in Bavaria", also known as "Christlich-Soziale Union in Bayern".
+    4. Die Linke: "The Left".
+    5. FDP: also known as "Freie Demokratische Partei", also known as "Free Democratic Party".
+    6. BÜNDNIS 90/DIE GRÜNEN: also known as "Die Grünen", also known as "Alliance 90/The Greens" also known as "The Greens".
+    7. SPD: also known as "Social Democratic Party of Germany", also known as "Sozialdemokratische Partei Deutschlands".
+
+    If the question is about comparing the stances of different parties, represent the output in the following json schema (keep in mind the details field is always a string):
     {structured_comparison_parser.get_format_instructions()}
     
-    Otherwise, provide the output in the following json format
+    Otherwise, represent the output in the following json schema (string Free text answer):
     {free_text_answer_parser.get_format_instructions()}
+    
+    All serialized fields are either strings or list of strings. The field names are lower snake case and the field values
+    are translated.
     """
     answer = await answer_question(question, None)
+    print("#" * 100)
+    print(answer)
+    print("#" * 100)
     if "comparison" in answer:
         return structured_comparison_parser.parse(answer)
     else:
