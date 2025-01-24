@@ -10,10 +10,14 @@ from langchain_text_splitters import (
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 
+from me.daif.agent.language import SupportedLanguage
+
 FAISS_INDEX_NAME = "local.db"
 
 
-async def answer_question(question: str) -> str:
+async def answer_question(
+    question: str, language: SupportedLanguage = SupportedLanguage.english
+) -> str:
     vectorstore = await _load_vectorstore()
 
     retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
@@ -27,7 +31,7 @@ async def answer_question(question: str) -> str:
     retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
     question = f"""
         {question}
-        Please provide your answer in the language of the question.
+        Please provide your answer in the {language} lanugage.
     """
     response = retrieval_chain.invoke({"input": question})
     answer = response["answer"]

@@ -94,7 +94,9 @@ async def most_important_topics(
 
 
 @app.get("/answer-question")
-async def answer_user_question(question: str):
+async def answer_user_question(
+    question: str, language: SupportedLanguage = SupportedLanguage.english
+):
     return {
-        "body": await answer_question(question),
+        "answer": await answer_question(question, language),
     }

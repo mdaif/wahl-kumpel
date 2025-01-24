@@ -304,18 +304,46 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  function sendMessage() {
-    const userText = userInput.value.trim();
-    if (!userText) return;
-    addMessage(userText, true);
-    userInput.value = '';
+function sendMessage() {
+  const userText = userInput.value.trim();
+  if (!userText) return;
+  addMessage(userText, true);
+  userInput.value = '';
 
-    // Simulate a bot reply
-    setTimeout(() => {
-      const mockResponse = `Placeholder about "${userText}"`;
-      addMessage(mockResponse);
-    }, 800);
-  }
+  // Add the "sending..." message
+  const sendingMessage = document.createElement('div');
+  sendingMessage.classList.add('message', 'bot-message');
+  sendingMessage.textContent = 'sending';
+  chatMessages.appendChild(sendingMessage);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  // Add animated dots
+  let dotCount = 0;
+  const dotsInterval = setInterval(() => {
+    dotCount = (dotCount + 1) % 4; // Loop through 0 to 3 dots
+    sendingMessage.textContent = 'typing' + '.'.repeat(dotCount);
+  }, 500);
+
+  // Fetch the response from the server
+  const lang = document.getElementById('langSelector').value;
+
+  fetch(`/answer-question?question=${encodeURIComponent(userText)},language=${encodeURIComponent(lang)}`)
+    .then(res => res.json())
+    .then(data => {
+      clearInterval(dotsInterval); // Stop the animated dots
+      chatMessages.removeChild(sendingMessage); // Remove the "sending..." message
+      addMessage(data.answer); // Add the actual response
+    })
+    .catch(err => {
+      console.error(err);
+      clearInterval(dotsInterval); // Stop the animated dots
+      chatMessages.removeChild(sendingMessage); // Remove the "sending..." message
+      addMessage('Error fetching answer.'); // Show error message
+    });
+}
+
+
+
 
   /************************************************************
    * 3. Language Switcher (Chat Header)
