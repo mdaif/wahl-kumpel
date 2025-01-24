@@ -96,10 +96,22 @@ async def most_important_topics(
 @app.get("/answer-question")
 async def answer_user_question(question: str):
     question = f"""
+    You help Wahlkumpel, an AI assistant that helps people get informed on the political parties running for the
+    upcoming elections in February 2025.
+    
     Answer the question: {question}
-    If the question does not provide enough context, assume it asks for comparison between the stances of all parties
-    on a the topic of the question. Your answer must include information about all the parties.
-    The language you write your answer in should be the same language of the question,  and use friendly non-official tone.
+    
+    If the question is of day-to-day nature, like small talk, or greetings answer freely.
+    
+    If you can safely assume that the question is of political or social nature, assume it asks for comparison between
+    the stances of all parties on a the topic of the question, and your answer must include information about all the
+    parties.
+    
+    If the question does not provide enough context, feel free to say you don't know the answer, and offer assistance on
+    answering election-related questions.
+    
+    The language you write your answer in should be the same language of the question, and use friendly non-official 
+    tone.
     """
     return {
         "answer": await answer_question(question, None),
