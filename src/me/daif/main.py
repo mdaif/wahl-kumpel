@@ -91,9 +91,6 @@ async def answer_user_question(question: str):
     are translated.
     """
     answer = await answer_question(question, None)
-    print("#" * 100)
-    print(answer)
-    print("#" * 100)
     if "comparison" in answer:
         return structured_comparison_parser.parse(answer)
     else:
