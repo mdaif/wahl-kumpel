@@ -203,14 +203,13 @@
       font-size: 1rem;
     }
 
-    # Messages from agent
+    /* Messages from agent */
     .message.bot-message strong {
       font-size: 1.1rem;
       color: #343a40;
       display: block;
       margin-bottom: 0.5rem;
     }
-
     .message.bot-message p {
       margin: 0;
       font-size: 1rem;
@@ -218,6 +217,32 @@
       color: #495057;
     }
 
+    /* Typing indicator (three animated dots) */
+    .typing-indicator {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .typing-indicator span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      margin: 0 2px;
+      border-radius: 50%;
+      background-color: #343a40;
+      opacity: 0.6;
+      animation: typingDots 1s infinite alternate;
+    }
+    @keyframes typingDots {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(-5px);
+      }
+    }
+    .typing-text {
+      margin-right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -307,63 +332,69 @@
   function addMessage(text, isUser = false) {
     const msg = document.createElement('div');
     msg.classList.add('message', isUser ? 'user-message' : 'bot-message');
-    msg.textContent = text;
+    msg.innerHTML = text;
     chatMessages.appendChild(msg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-function sendMessage() {
-  const userText = userInput.value.trim();
-  if (!userText) return;
-  addMessage(userText, true); // Add user message
-  userInput.value = '';
+  function sendMessage() {
+    const userText = userInput.value.trim();
+    if (!userText) return;
+    addMessage(userText, true); // Add user message
+    userInput.value = '';
 
-  const lang = document.getElementById('langSelector').value;
+    const lang = document.getElementById('langSelector').value;
 
-  // Show "typing..." message
-  const typingMessage = document.createElement('div');
-  typingMessage.classList.add('message', 'bot-message');
-  typingMessage.textContent = lang === 'English' ? 'typing...' : 'schreibt...';
-  chatMessages.appendChild(typingMessage);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Show "typing" with animated dots
+    const typingMessage = document.createElement('div');
+    typingMessage.classList.add('message', 'bot-message');
+    typingMessage.innerHTML = `
+      <span class="typing-text">${lang === 'English' ? 'Typing' : 'Schreibt'}</span>
+      <span class="typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    `;
+    chatMessages.appendChild(typingMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  // Fetch the response from the server
-  fetch(`/answer-question?question=${encodeURIComponent(userText)},language=${encodeURIComponent(lang)}`)
-    .then((res) => res.json())
-    .then((data) => {
-      chatMessages.removeChild(typingMessage); // Remove "typing..." message
+    // Fetch the response from the server
+    fetch(`/answer-question?question=${encodeURIComponent(userText)},language=${encodeURIComponent(lang)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        chatMessages.removeChild(typingMessage); // Remove "typing..." message
 
-      if (data.freeTextAnswer) {
-        addMessage(data.freeTextAnswer, false);
-      }
-      else if (data.comparison) {
-        // Format "comparison" key content
-        data.comparison.forEach((item) => {
-          const comparisonMessage = `
-            <div class="message bot-message">
-              <strong>${item.name}</strong>
-              <p>${item.details}</p>
-            </div>
-          `;
-          chatMessages.innerHTML += comparisonMessage;
-        });
-      } else if (data.answer) {
-        // Handle standard answers
-        addMessage(data.answer, false);
-      } else {
-        // Handle unexpected responses
-        addMessage('Sorry, I couldn\'t understand the response.', false);
-      }
+        if (data.freeTextAnswer) {
+          addMessage(data.freeTextAnswer, false);
+        }
+        else if (data.comparison) {
+          // Format "comparison" key content
+          data.comparison.forEach((item) => {
+            const comparisonMessage = `
+              <div class="message bot-message">
+                <strong>${item.name}</strong>
+                <p>${item.details}</p>
+              </div>
+            `;
+            chatMessages.innerHTML += comparisonMessage;
+          });
+        } else if (data.answer) {
+          // Handle standard answers
+          addMessage(data.answer, false);
+        } else {
+          // Handle unexpected responses
+          addMessage("Sorry, I couldn't understand the response.", false);
+        }
 
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    })
-    .catch((err) => {
-      console.error(err);
-      chatMessages.removeChild(typingMessage);
-      addMessage('Error fetching answer.', false);
-    });
-}
-
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      })
+      .catch((err) => {
+        console.error(err);
+        chatMessages.removeChild(typingMessage);
+        addMessage('Error fetching answer.', false);
+      });
+  }
 
   /************************************************************
    * 3. Language Switcher (Chat Header)
