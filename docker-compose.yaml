@@ -4,4 +4,4 @@ services:
     environment:
       OPENAI_API_KEY: "${OPENAI_API_KEY}"
     ports:
-      - "9000:80"
+      - "80:80"

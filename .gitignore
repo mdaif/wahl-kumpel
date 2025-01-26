@@ -11,3 +11,7 @@ wheels/
 .idea/
 /local.db/
 src/wahl_kumpel.egg-info
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
