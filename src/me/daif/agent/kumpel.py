@@ -1,9 +1,10 @@
 import os
 
-from langchain import hub
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
+from langchain.chains import create_history_aware_retriever
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
 )
@@ -16,26 +17,62 @@ FAISS_INDEX_NAME = "local.db"
 
 
 async def answer_question(
-    question: str, language: SupportedLanguage | None = SupportedLanguage.english
+    question: str, language: SupportedLanguage, chat_history: list[str]
 ) -> str:
     vectorstore = await _load_vectorstore()
 
-    retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
-    combine_docs_chain = create_stuff_documents_chain(
-        ChatOpenAI(temperature=0), retrieval_qa_chat_prompt
-    )
     retriever = vectorstore.as_retriever(
         search_type="mmr",
         search_kwargs={"k": 30, "fetch_k": 60, "lambda_mult": 0.5},
     )
-    retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
-    if language:
-        question = f"""
-            {question}
-            Please translate your answer in the {language} language.
-        """
-    response = retrieval_chain.invoke({"input": question})
+
+    llm = ChatOpenAI(temperature=0)
+
+    # Contextualize question
+    contextualize_q_system_prompt = (
+        "Given a chat history and the latest user question "
+        "which might reference context in the chat history, "
+        "formulate a standalone question which can be understood "
+        "without the chat history. Do NOT answer the question, just "
+        "reformulate it if needed and otherwise return it as is."
+    )
+    contextualize_q_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", contextualize_q_system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ]
+    )
+    history_aware_retriever = create_history_aware_retriever(
+        llm, retriever, contextualize_q_prompt
+    )
+
+    qa_system_prompt = (
+        "You are an assistant for question-answering tasks. Use "
+        "the following pieces of retrieved context to answer the "
+        "question. If you don't know the answer, just say that you "
+        "don't know. Use three sentences maximum and keep the answer "
+        "concise."
+        "\n\n"
+        "{context}"
+    )
+    qa_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", qa_system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ]
+    )
+    question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+    rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+
+    question = f"""
+        {question}
+        Translate your answer in the {language} language.
+    """
+    response = rag_chain.invoke({"input": question, "chat_history": chat_history})
     answer = response["answer"]
+
     return answer
 
 

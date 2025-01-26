@@ -1,4 +1,5 @@
 import secrets
+from collections import defaultdict
 from typing import Annotated
 
 from fastapi import FastAPI, Request, Depends, HTTPException
@@ -23,6 +24,9 @@ templates = Jinja2Templates(directory="templates")
 
 USER = "wahlkumpelUser"
 PASS = "dcbb4290-94a3-4fb0-b982-1ea32dee65d5"
+
+# Maps a user id -> ${language}: list[chat history items (both question and answer)]
+chat_history = defaultdict(lambda: defaultdict(list))
 
 
 def check_credentials(
@@ -74,12 +78,12 @@ async def most_important_topics(
         Provide the output in the following JSON format:
         {most_important_topics_parser.get_format_instructions()}
     """
-    answer = await answer_question(question, language)
+    answer = await answer_question(question, language, [])
     return most_important_topics_parser.parse(answer)
 
 
 @app.get("/answer-question")
-async def answer_user_question(question: str):
+async def answer_user_question(user_id: str, language: str, question: str):
     question = f"""
     You are Wahlkumpel, an AI assistant that helps people get informed on the political parties running for the
     upcoming elections in February 2025.
@@ -123,7 +127,9 @@ async def answer_user_question(question: str):
     All serialized fields are either strings or list of strings. The field names are lower snake case and the field values
     are translated.
     """
-    answer = await answer_question(question, None)
+    answer = await answer_question(question, language, chat_history[user_id][language])
+    chat_history[user_id][language].append(f"question: {question}, answer: {answer}")
+
     if "comparison" in answer:
         return structured_comparison_parser.parse(answer)
     else:

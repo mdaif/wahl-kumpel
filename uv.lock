@@ -576,20 +576,6 @@ wheels = [
 ]
 
 [[package]]
-name = "langchainhub"
-version = "0.1.21"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "packaging" },
-    { name = "requests" },
-    { name = "types-requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/71/50/76719d356d80b00761d9680e3eb5df0f5ca8587e79b60ae6dcb678828cdd/langchainhub-0.1.21.tar.gz", hash = "sha256:723383b3964a47dbaea6ad5d0ef728accefbc9d2c07480e800bdec43510a8c10", size = 4481 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/35/63/40328157ddee807991f2f1992c2ad88f479b2472dc9e40d08ccf10700735/langchainhub-0.1.21-py3-none-any.whl", hash = "sha256:1cc002dc31e0d132a776afd044361e2b698743df5202618cf2bad399246b895f", size = 5203 },
-]
-
-[[package]]
 name = "langsmith"
 version = "0.2.11"
 source = { registry = "https://pypi.org/simple" }
@@ -1200,18 +1186,6 @@ wheels = [
 ]
 
 [[package]]
-name = "types-requests"
-version = "2.32.0.20241016"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "urllib3" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/fa/3c/4f2a430c01a22abd49a583b6b944173e39e7d01b688190a5618bd59a2e22/types-requests-2.32.0.20241016.tar.gz", hash = "sha256:0d9cad2f27515d0e3e3da7134a1b6f28fb97129d86b867f24d9c726452634d95", size = 18065 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/01/485b3026ff90e5190b5e24f1711522e06c79f4a56c8f4b95848ac072e20f/types_requests-2.32.0.20241016-py3-none-any.whl", hash = "sha256:4195d62d6d3e043a4eaaf08ff8a62184584d2e8684e9d2aa178c7915a7da3747", size = 15836 },
-]
-
-[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 source = { registry = "https://pypi.org/simple" }
@@ -1292,7 +1266,6 @@ dependencies = [
     { name = "langchain" },
     { name = "langchain-community" },
     { name = "langchain-openai" },
-    { name = "langchainhub" },
     { name = "pypdf" },
     { name = "ruff" },
 ]
@@ -1306,7 +1279,6 @@ requires-dist = [
     { name = "langchain", specifier = ">=0.3.14" },
     { name = "langchain-community", specifier = ">=0.3.14" },
     { name = "langchain-openai", specifier = ">=0.3.0" },
-    { name = "langchainhub", specifier = ">=0.1.21" },
     { name = "pypdf", specifier = ">=5.1.0" },
     { name = "ruff", specifier = ">=0.9.2" },
 ]

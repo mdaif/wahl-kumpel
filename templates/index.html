@@ -337,8 +337,29 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
+  function getOrCreateUserId() {
+      // Check if a user ID already exists in localStorage
+      let userId = localStorage.getItem("userId");
+
+      if (!userId) {
+          // If no user ID exists, create a new one
+          userId = generateUserId();
+          localStorage.setItem("userId", userId);
+      }
+
+      return userId;
+  }
+
+  function generateUserId() {
+      // Generate a simple random user ID (e.g., UUID or random string)
+      return "user-" + Math.random().toString(36).substring(2, 15);
+  }
+
+
   function sendMessage() {
     const userText = userInput.value.trim();
+    const userId = getOrCreateUserId();
+
     if (!userText) return;
     addMessage(userText, true); // Add user message
     userInput.value = '';
@@ -360,7 +381,7 @@
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     // Fetch the response from the server
-    fetch(`/answer-question?question=${encodeURIComponent(userText)},language=${encodeURIComponent(lang)}`)
+    fetch(`/answer-question?question=${encodeURIComponent(userText)}&language=${encodeURIComponent(lang)}&user_id=${encodeURIComponent(userId)}`)
       .then((res) => res.json())
       .then((data) => {
         chatMessages.removeChild(typingMessage); // Remove "typing..." message
