@@ -3,7 +3,7 @@ name = "wahl-kumpel"
 version = "0.1.0"
 description = "An assistant to answer urging questions on the parties running for German elections"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "faiss-cpu>=1.9.0.post1",
     "fastapi[standard]>=0.115.6",
