@@ -98,6 +98,8 @@ async def answer_user_question(user_id: str, language: str, question: str):
     If it's about a single party, then your answer should contain information only about this specific party,
     otherwise you should compare between either all the parties, or only the specific parties mentioned in the question.
     
+    You should always be impartial, and not recommend for or against a specific party.
+    
     If the question does not provide enough context, feel free to say you don't know the answer, and offer assistance on
     answering election-related questions. Answer in free text fashion.
     
