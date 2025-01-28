@@ -6,6 +6,7 @@
 
   <!-- Minimal reset and basic styling for demonstration -->
   <style>
+    /* Existing Styles */
     /* Container for everything above chat */
     .header-container {
       text-align: center;
@@ -243,262 +244,370 @@
     .typing-text {
       margin-right: 5px;
     }
+
+    /* --- Collapsible Sidebar Styles --- */
+    /* Sidebar container */
+    .sidebar {
+      height: 100%; /* Full-height */
+      width: 0; /* Initial width is 0 */
+      position: fixed; /* Stay in place */
+      z-index: 1000; /* Sit on top */
+      top: 0;
+      left: 0;
+      background-color: #111; /* Black */
+      overflow-x: hidden; /* Disable horizontal scroll */
+      transition: width 0.3s; /* Transition effect */
+      padding-top: 60px; /* Place content 60px from the top */
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+    }
+
+    /* Sidebar links */
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      font-size: 1.2rem;
+      color: #818181;
+      display: block;
+      transition: color 0.3s, background-color 0.3s;
+    }
+
+    /* Sidebar links on hover */
+    .sidebar a:hover {
+      color: #f1f1f1;
+      background-color: #575757;
+    }
+
+    /* Close button (top right corner inside sidebar) */
+    .sidebar .closebtn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 2rem;
+      margin-left: 50px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* Open button (hamburger menu) */
+    .openbtn {
+      font-size: 2rem;
+      cursor: pointer;
+      background-color: transparent;
+      color: #111;
+      border: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1001; /* Above the sidebar */
+      transition: color 0.3s;
+    }
+
+    .openbtn:hover {
+      color: #6c757d;
+    }
+
+    /* Adjust body when sidebar is open */
+    body.sidebar-open {
+      margin-left: 250px; /* Same as the sidebar width */
+      transition: margin-left 0.3s;
+    }
+
+    /* Responsive Sidebar */
+    @media screen and (max-width: 600px) {
+      .sidebar { width: 200px; }
+      body.sidebar-open { margin-left: 200px; }
+    }
   </style>
 </head>
 <body>
 
-<div class="header-container">
-  <h1 id="title">🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪</h1>
-
-  <!-- Language Selector -->
-  <div class="language-bar">
-    <label for="langSelector">Language:</label>
-    <select id="langSelector" onchange="fetchTopics()">
-      <option value="English" selected>English</option>
-      <option value="German">Deutsch</option>
-    </select>
-  </div>
-</div>
-
-<!-- Carousel Container -->
-<div class="carousel-container">
-  <!-- Spinner overlay -->
-  <div class="spinner-container" id="spinnerContainer">
-    <div class="spinner"></div>
+  <!-- --- Collapsible Sidebar --- -->
+  <div id="sidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()" aria-label="Close Sidebar">&times;</a>
+    <a href="https://www.linkedin.com/in/muhammaddaif/" target="_blank" aria-label="LinkedIn Profile">LinkedIn</a>
+    <a href="https://github.com/mdaif/wahl-kumpel" target="_blank" aria-label="Source Code">Source Code</a>
   </div>
 
-  <!-- Left arrow button -->
-  <button class="carousel-btn left" onclick="prevCard()">&laquo;</button>
+  <!-- Open Sidebar Button -->
+  <button class="openbtn" onclick="toggleSidebar()" aria-label="Open Sidebar">&#9776;</button>
 
-  <!-- Carousel track -->
-  <div class="carousel-track" id="carouselTrack"></div>
+  <!-- Existing Content -->
+  <div class="header-container">
+    <h1 id="title">🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪</h1>
 
-  <!-- Right arrow button -->
-  <button class="carousel-btn right" onclick="nextCard()">&raquo;</button>
-</div>
+    <!-- Language Selector -->
+    <div class="language-bar">
+      <label for="langSelector">Language:</label>
+      <select id="langSelector" onchange="fetchTopics()">
+        <option value="English" selected>English</option>
+        <option value="German">Deutsch</option>
+      </select>
+    </div>
+  </div>
 
-<!-- Chat Container -->
-<div class="chat-container">
-  <div class="chat-header" id="chatHeader">Ask me!</div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <form class="chat-input" onsubmit="sendMessage(); return false;">
-    <input type="text" id="userInput" placeholder="Type your question..." />
-    <button type="submit" id="submitButton">Send</button>
-  </form>
-</div>
+  <!-- Carousel Container -->
+  <div class="carousel-container">
+    <!-- Spinner overlay -->
+    <div class="spinner-container" id="spinnerContainer">
+      <div class="spinner"></div>
+    </div>
 
-<script>
-  /************************************************************
-   * 1. Carousel + Flip Cards Logic
-   ************************************************************/
-  let currentIndex = 0;
-  let cardWidth = 0;
-  let totalCards = 0;
-  const carouselTrack = document.getElementById('carouselTrack');
-  const spinnerContainer = document.getElementById('spinnerContainer');
+    <!-- Left arrow button -->
+    <button class="carousel-btn left" onclick="prevCard()">&laquo;</button>
 
-  function updateTransform() {
-    const visibleCards = 3.5;
-    const maxIndex = Math.floor(totalCards - visibleCards);
-    currentIndex = Math.min(currentIndex, maxIndex);
-    currentIndex = Math.max(0, currentIndex);
+    <!-- Carousel track -->
+    <div class="carousel-track" id="carouselTrack"></div>
 
-    carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+    <!-- Right arrow button -->
+    <button class="carousel-btn right" onclick="nextCard()">&raquo;</button>
+  </div>
 
-    if (currentIndex === maxIndex) {
-      carouselTrack.style.paddingRight = '50px';
-    } else {
-      carouselTrack.style.paddingRight = '0';
-    }
-  }
+  <!-- Chat Container -->
+  <div class="chat-container">
+    <div class="chat-header" id="chatHeader">Ask me!</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <form class="chat-input" onsubmit="sendMessage(); return false;">
+      <input type="text" id="userInput" placeholder="Type your question..." />
+      <button type="submit" id="submitButton">Send</button>
+    </form>
+  </div>
 
-  function nextCard() {
-    currentIndex++;
-    updateTransform();
-  }
+  <!-- Existing Script -->
+  <script>
+    /************************************************************
+     * 1. Carousel + Flip Cards Logic
+     ************************************************************/
+    let currentIndex = 0;
+    let cardWidth = 0;
+    let totalCards = 0;
+    const carouselTrack = document.getElementById('carouselTrack');
+    const spinnerContainer = document.getElementById('spinnerContainer');
 
-  function prevCard() {
-    currentIndex--;
-    updateTransform();
-  }
+    function updateTransform() {
+      const visibleCards = 3.5;
+      const maxIndex = Math.floor(totalCards - visibleCards);
+      currentIndex = Math.min(currentIndex, maxIndex);
+      currentIndex = Math.max(0, currentIndex);
 
-  /************************************************************
-   * 2. Chat Logic
-   ************************************************************/
-  const chatMessages = document.getElementById('chatMessages');
-  const userInput = document.getElementById('userInput');
-  const submitButton = document.getElementById('submitButton');
+      carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
 
-  function addMessage(text, isUser = false) {
-    const msg = document.createElement('div');
-    msg.classList.add('message', isUser ? 'user-message' : 'bot-message');
-    msg.innerHTML = text;
-    chatMessages.appendChild(msg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  function getOrCreateUserId() {
-      // Check if a user ID already exists in localStorage
-      let userId = localStorage.getItem("userId");
-
-      if (!userId) {
-          // If no user ID exists, create a new one
-          userId = generateUserId();
-          localStorage.setItem("userId", userId);
+      if (currentIndex === maxIndex) {
+        carouselTrack.style.paddingRight = '50px';
+      } else {
+        carouselTrack.style.paddingRight = '0';
       }
+    }
 
-      return userId;
-  }
+    function nextCard() {
+      currentIndex++;
+      updateTransform();
+    }
 
-  function generateUserId() {
-      // Generate a simple random user ID (e.g., UUID or random string)
-      return "user-" + Math.random().toString(36).substring(2, 15);
-  }
+    function prevCard() {
+      currentIndex--;
+      updateTransform();
+    }
 
+    /************************************************************
+     * 2. Chat Logic
+     ************************************************************/
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const submitButton = document.getElementById('submitButton');
 
-  function sendMessage() {
-    const userText = userInput.value.trim();
-    const userId = getOrCreateUserId();
+    function addMessage(text, isUser = false) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', isUser ? 'user-message' : 'bot-message');
+      msg.innerHTML = text;
+      chatMessages.appendChild(msg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-    if (!userText) return;
-    addMessage(userText, true); // Add user message
-    userInput.value = '';
+    function getOrCreateUserId() {
+        // Check if a user ID already exists in localStorage
+        let userId = localStorage.getItem("userId");
 
-    const lang = document.getElementById('langSelector').value;
-
-    // Show "typing" with animated dots
-    const typingMessage = document.createElement('div');
-    typingMessage.classList.add('message', 'bot-message');
-    typingMessage.innerHTML = `
-      <span class="typing-text">${lang === 'English' ? 'Typing' : 'Schreibt'}</span>
-      <span class="typing-indicator">
-        <span></span>
-        <span></span>
-        <span></span>
-      </span>
-    `;
-    chatMessages.appendChild(typingMessage);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Fetch the response from the server
-    fetch(`/answer-question?question=${encodeURIComponent(userText)}&language=${encodeURIComponent(lang)}&user_id=${encodeURIComponent(userId)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        chatMessages.removeChild(typingMessage); // Remove "typing..." message
-
-        if (data.freeTextAnswer) {
-          addMessage(data.freeTextAnswer, false);
+        if (!userId) {
+            // If no user ID exists, create a new one
+            userId = generateUserId();
+            localStorage.setItem("userId", userId);
         }
-        else if (data.comparison) {
-          // Format "comparison" key content
-          data.comparison.forEach((item) => {
-            const comparisonMessage = `
-              <div class="message bot-message">
-                <strong>${item.name}</strong>
-                <p>${item.details}</p>
+
+        return userId;
+    }
+
+    function generateUserId() {
+        // Generate a simple random user ID (e.g., UUID or random string)
+        return "user-" + Math.random().toString(36).substring(2, 15);
+    }
+
+
+    function sendMessage() {
+      const userText = userInput.value.trim();
+      const userId = getOrCreateUserId();
+
+      if (!userText) return;
+      addMessage(userText, true); // Add user message
+      userInput.value = '';
+
+      const lang = document.getElementById('langSelector').value;
+
+      // Show "typing" with animated dots
+      const typingMessage = document.createElement('div');
+      typingMessage.classList.add('message', 'bot-message');
+      typingMessage.innerHTML = `
+        <span class="typing-text">${lang === 'English' ? 'Typing' : 'Schreibt'}</span>
+        <span class="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      `;
+      chatMessages.appendChild(typingMessage);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Fetch the response from the server
+      fetch(`/answer-question?question=${encodeURIComponent(userText)}&language=${encodeURIComponent(lang)}&user_id=${encodeURIComponent(userId)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          chatMessages.removeChild(typingMessage); // Remove "typing..." message
+
+          if (data.freeTextAnswer) {
+            addMessage(data.freeTextAnswer, false);
+          }
+          else if (data.comparison) {
+            // Format "comparison" key content
+            data.comparison.forEach((item) => {
+              const comparisonMessage = `
+                <div class="message bot-message">
+                  <strong>${item.name}</strong>
+                  <p>${item.details}</p>
+                </div>
+              `;
+              chatMessages.innerHTML += comparisonMessage;
+            });
+          } else if (data.answer) {
+            // Handle standard answers
+            addMessage(data.answer, false);
+          } else {
+            // Handle unexpected responses
+            addMessage("Sorry, I couldn't understand the response.", false);
+          }
+
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        })
+        .catch((err) => {
+          console.error(err);
+          chatMessages.removeChild(typingMessage);
+          addMessage('Error fetching answer.', false);
+        });
+    }
+
+    /************************************************************
+     * 3. Language Switcher (Chat Header)
+     ************************************************************/
+    const chatHeader = document.getElementById('chatHeader');
+    const title = document.getElementById('title');
+    function changeChatHeader(lang) {
+      if (lang === 'English') {
+        chatHeader.textContent = "Ask me!";
+        userInput.placeholder = "Type your question";
+        submitButton.innerText = "Send";
+        title.textContent = "🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪";
+      }
+      else if (lang === 'German') {
+        chatHeader.textContent = "Frag mich!";
+        userInput.placeholder = "Gib deine Frage ein";
+        submitButton.innerText = "Sende";
+        title.textContent = "🇩🇪 🇩🇪 Wahlkumpel – dein freundlicher Helfer beim Lesen von Wahl-PDFs! 🇩🇪 🇩🇪";
+      }
+    }
+
+    /************************************************************
+     * 4. Fetch Topics by Language
+     ************************************************************/
+    function topicClicked(backText) {
+      userInput.value = backText;
+      window.scrollTo(0, document.body.scrollHeight);
+      sendMessage();
+    }
+
+    function fetchTopics() {
+      const lang = document.getElementById('langSelector').value;
+      changeChatHeader(lang);
+
+      spinnerContainer.style.display = 'block';
+      carouselTrack.innerHTML = '';
+      currentIndex = 0;
+      totalCards = 0;
+
+      const url = `/topics?language=${encodeURIComponent(lang)}`;
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          const topics = data.topics || [];
+          totalCards = topics.length;
+
+          topics.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'flip-card';
+            card.innerHTML = `
+              <div class="flip-card-inner" onclick="topicClicked('${item.backText}')">
+                <div class="flip-card-front">
+                  <h5>${item.frontText}</h5>
+                </div>
+                <div class="flip-card-back">
+                  <p>${item.backText}</p>
+                </div>
               </div>
             `;
-            chatMessages.innerHTML += comparisonMessage;
+            carouselTrack.appendChild(card);
           });
-        } else if (data.answer) {
-          // Handle standard answers
-          addMessage(data.answer, false);
-        } else {
-          // Handle unexpected responses
-          addMessage("Sorry, I couldn't understand the response.", false);
-        }
+        })
+        .catch(err => console.error('Error fetching topics:', err))
+        .finally(() => {
+          spinnerContainer.style.display = 'none';
 
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      })
-      .catch((err) => {
-        console.error(err);
-        chatMessages.removeChild(typingMessage);
-        addMessage('Error fetching answer.', false);
-      });
-  }
-
-  /************************************************************
-   * 3. Language Switcher (Chat Header)
-   ************************************************************/
-  const chatHeader = document.getElementById('chatHeader');
-  const title = document.getElementById('title');
-  function changeChatHeader(lang) {
-    if (lang === 'English') {
-      chatHeader.textContent = "Ask me!";
-      userInput.placeholder = "Type your question";
-      submitButton.innerText = "Send";
-      title.textContent = "🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪";
-    }
-    else if (lang === 'German') {
-      chatHeader.textContent = "Frag mich!";
-      userInput.placeholder = "Gib deine Frage ein";
-      submitButton.innerText = "Sende";
-      title.textContent = "🇩🇪 🇩🇪 Wahlkumpel – dein freundlicher Helfer beim Lesen von Wahl-PDFs! 🇩🇪 🇩🇪";
-    }
-  }
-
-  /************************************************************
-   * 4. Fetch Topics by Language
-   ************************************************************/
-  function topicClicked(backText) {
-    userInput.value = backText;
-    window.scrollTo(0, document.body.scrollHeight);
-    sendMessage();
-  }
-
-  function fetchTopics() {
-    const lang = document.getElementById('langSelector').value;
-    changeChatHeader(lang);
-
-    spinnerContainer.style.display = 'block';
-    carouselTrack.innerHTML = '';
-    currentIndex = 0;
-    totalCards = 0;
-
-    const url = `/topics?language=${encodeURIComponent(lang)}`;
-
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        const topics = data.topics || [];
-        totalCards = topics.length;
-
-        topics.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'flip-card';
-          card.innerHTML = `
-            <div class="flip-card-inner" onclick="topicClicked('${item.backText}')">
-              <div class="flip-card-front">
-                <h5>${item.frontText}</h5>
-              </div>
-              <div class="flip-card-back">
-                <p>${item.backText}</p>
-              </div>
-            </div>
-          `;
-          carouselTrack.appendChild(card);
+          const firstCard = carouselTrack.querySelector('.flip-card');
+          if (firstCard) {
+            const style = window.getComputedStyle(firstCard);
+            const baseWidth = firstCard.offsetWidth;
+            const marginLeft = parseFloat(style.marginLeft);
+            const marginRight = parseFloat(style.marginRight);
+            cardWidth = baseWidth + marginLeft + marginRight;
+          } else {
+            cardWidth = 240;
+          }
+          updateTransform();
         });
-      })
-      .catch(err => console.error('Error fetching topics:', err))
-      .finally(() => {
-        spinnerContainer.style.display = 'none';
+    }
 
-        const firstCard = carouselTrack.querySelector('.flip-card');
-        if (firstCard) {
-          const style = window.getComputedStyle(firstCard);
-          const baseWidth = firstCard.offsetWidth;
-          const marginLeft = parseFloat(style.marginLeft);
-          const marginRight = parseFloat(style.marginRight);
-          cardWidth = baseWidth + marginLeft + marginRight;
-        } else {
-          cardWidth = 240;
-        }
-        updateTransform();
-      });
-  }
+    /************************************************************
+     * 5. Collapsible Sidebar Logic
+     ************************************************************/
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar.style.width === '250px') {
+        sidebar.style.width = '0';
+        document.body.classList.remove('sidebar-open');
+      } else {
+        sidebar.style.width = '250px';
+        document.body.classList.add('sidebar-open');
+      }
+    }
 
-  window.addEventListener('DOMContentLoaded', fetchTopics);
-</script>
+    // Optional: Close the sidebar if user clicks outside of it
+    window.onclick = function(event) {
+      const sidebar = document.getElementById('sidebar');
+      const openBtn = document.querySelector('.openbtn');
+      if (sidebar.style.width === '250px' && !sidebar.contains(event.target) && event.target !== openBtn) {
+        toggleSidebar();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchTopics);
+  </script>
 
 </body>
 </html>
