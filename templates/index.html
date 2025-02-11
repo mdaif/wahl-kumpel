@@ -3,24 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Wahlkumpel</title>
-
-  <!-- Minimal reset and basic styling for demonstration -->
   <style>
-    /* Existing Styles */
-    /* Container for everything above chat */
-    .header-container {
-      text-align: center;
-      margin: 1em 0;
-    }
-
-    /* --- Language Selector --- */
-    .language-bar {
-      margin-bottom: 1em;
-    }
-
-    /********************************************
-     * Carousel Container
-     ********************************************/
+    /* --- Existing Styles --- */
+    .header-container { text-align: center; margin: 1em 0; }
+    .language-bar { margin-bottom: 1em; }
     .carousel-container {
       position: relative;
       width: 1042px;
@@ -31,7 +17,6 @@
       overflow: hidden;
       background-color: #f7f7f7;
     }
-
     .carousel-track {
       width: 100%;
       height: 70%;
@@ -44,7 +29,6 @@
       box-sizing: border-box;
       position: relative;
     }
-
     .spinner-container {
       position: absolute;
       top: 50%;
@@ -63,11 +47,7 @@
       margin: 0 auto;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .carousel-btn {
       position: absolute;
       top: 50%;
@@ -81,16 +61,8 @@
       padding: 0.5rem 1rem;
       border-radius: 4px;
     }
-    .carousel-btn.left {
-      left: 1rem;
-    }
-    .carousel-btn.right {
-      right: 1rem;
-    }
-
-    /********************************************
-     * Flip Cards
-     ********************************************/
+    .carousel-btn.left { left: 1rem; }
+    .carousel-btn.right { right: 1rem; }
     .flip-card {
       width: 220px;
       height: 260px;
@@ -99,7 +71,6 @@
       flex-shrink: 0;
       font-size: 25px;
     }
-
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -108,7 +79,6 @@
       transform-style: preserve-3d;
       cursor: pointer;
     }
-
     .flip-card-front,
     .flip-card-back {
       position: absolute;
@@ -123,24 +93,13 @@
       text-align: center;
       padding: 1rem;
     }
-
-    .flip-card-front {
-      background-color: #dee2e6;
-      color: #343a40;
-    }
+    .flip-card-front { background-color: #dee2e6; color: #343a40; }
     .flip-card-back {
       background-color: #adb5bd;
       color: #ffffff;
       transform: rotateY(180deg);
     }
-
-    .flip-card:hover .flip-card-inner {
-      transform: rotateY(180deg);
-    }
-
-    /********************************************
-     * Chat Window
-     ********************************************/
+    .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
     .chat-container {
       width: 1042px;
       margin: 0 auto;
@@ -159,11 +118,7 @@
       text-align: center;
       font-size: 1.2rem;
     }
-    .chat-messages {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-    }
+    .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; }
     .message {
       margin: 0.5rem 0;
       max-width: 80%;
@@ -173,22 +128,9 @@
       display: inline-block;
       clear: both;
     }
-    .user-message {
-      background: #6c757d;
-      color: #ffffff;
-      float: right;
-      text-align: right;
-    }
-    .bot-message {
-      background: #dee2e6;
-      color: #343a40;
-      float: left;
-      text-align: left;
-    }
-    .chat-input {
-      display: flex;
-      border-top: 3px solid #6c757d;
-    }
+    .user-message { background: #6c757d; color: #ffffff; float: right; text-align: right; }
+    .bot-message { background: #dee2e6; color: #343a40; float: left; text-align: left; }
+    .chat-input { display: flex; border-top: 3px solid #6c757d; }
     .chat-input input {
       flex: 1;
       border: none;
@@ -204,21 +146,17 @@
       cursor: pointer;
       font-size: 1rem;
     }
-
-    /* Messages from agent */
-    .message.bot-message strong {
+    /* Button for loading topics */
+    .load-questions-btn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
       font-size: 1.1rem;
-      color: #343a40;
-      display: block;
-      margin-bottom: 0.5rem;
+      background-color: #6c757d;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
-    .message.bot-message p {
-      margin: 0;
-      font-size: 1rem;
-      line-height: 1.5;
-      color: #495057;
-    }
-
     /* Typing indicator (three animated dots) */
     .typing-indicator {
       display: inline-block;
@@ -235,34 +173,23 @@
       animation: typingDots 1s infinite alternate;
     }
     @keyframes typingDots {
-      0% {
-        transform: translateY(0);
-      }
-      100% {
-        transform: translateY(-5px);
-      }
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-5px); }
     }
-    .typing-text {
-      margin-right: 5px;
-    }
-
-    /* --- Collapsible Sidebar Styles --- */
-    /* Sidebar container */
+    /* --- Sidebar Styles (Restored) --- */
     .sidebar {
-      height: 100%; /* Full-height */
-      width: 0; /* Initial width is 0 */
-      position: fixed; /* Stay in place */
-      z-index: 1000; /* Sit on top */
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1000;
       top: 0;
       left: 0;
-      background-color: #111; /* Black */
-      overflow-x: hidden; /* Disable horizontal scroll */
-      transition: width 0.3s; /* Transition effect */
-      padding-top: 60px; /* Place content 60px from the top */
+      background-color: #111;
+      overflow-x: hidden;
+      transition: width 0.3s;
+      padding-top: 60px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.5);
     }
-
-    /* Sidebar links */
     .sidebar a {
       padding: 10px 20px;
       text-decoration: none;
@@ -271,14 +198,10 @@
       display: block;
       transition: color 0.3s, background-color 0.3s;
     }
-
-    /* Sidebar links on hover */
     .sidebar a:hover {
       color: #f1f1f1;
       background-color: #575757;
     }
-
-    /* Close button (top right corner inside sidebar) */
     .sidebar .closebtn {
       position: absolute;
       top: 10px;
@@ -288,8 +211,6 @@
       color: #fff;
       cursor: pointer;
     }
-
-    /* Open button (hamburger menu) */
     .openbtn {
       font-size: 2rem;
       cursor: pointer;
@@ -299,21 +220,14 @@
       position: fixed;
       top: 15px;
       left: 15px;
-      z-index: 1001; /* Above the sidebar */
+      z-index: 1001;
       transition: color 0.3s;
     }
-
-    .openbtn:hover {
-      color: #6c757d;
-    }
-
-    /* Adjust body when sidebar is open */
+    .openbtn:hover { color: #6c757d; }
     body.sidebar-open {
-      margin-left: 250px; /* Same as the sidebar width */
+      margin-left: 250px;
       transition: margin-left 0.3s;
     }
-
-    /* Responsive Sidebar */
     @media screen and (max-width: 600px) {
       .sidebar { width: 200px; }
       body.sidebar-open { margin-left: 200px; }
@@ -321,45 +235,34 @@
   </style>
 </head>
 <body>
-
-  <!-- --- Collapsible Sidebar --- -->
+  <!-- Sidebar (Restored) -->
   <div id="sidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="toggleSidebar()" aria-label="Close Sidebar">&times;</a>
     <a href="https://www.linkedin.com/in/muhammaddaif/" target="_blank" aria-label="LinkedIn Profile">LinkedIn</a>
     <a href="https://github.com/mdaif/wahl-kumpel" target="_blank" aria-label="Source Code">Source Code</a>
   </div>
-
-  <!-- Open Sidebar Button -->
   <button class="openbtn" onclick="toggleSidebar()" aria-label="Open Sidebar">&#9776;</button>
 
-  <!-- Existing Content -->
+  <!-- Header with Language Selector and Load Topics Button -->
   <div class="header-container">
     <h1 id="title">🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪</h1>
-
-    <!-- Language Selector -->
     <div class="language-bar">
       <label for="langSelector">Language:</label>
-      <select id="langSelector" onchange="fetchTopics()">
+      <select id="langSelector" onchange="updateLanguage()">
         <option value="English" selected>English</option>
         <option value="German">Deutsch</option>
       </select>
     </div>
+    <button id="loadQuestionsBtn" class="load-questions-btn" onclick="fetchTopics()">Suggest questions!</button>
   </div>
 
-  <!-- Carousel Container -->
+  <!-- Carousel Container (Always Visible) -->
   <div class="carousel-container">
-    <!-- Spinner overlay -->
     <div class="spinner-container" id="spinnerContainer">
       <div class="spinner"></div>
     </div>
-
-    <!-- Left arrow button -->
     <button class="carousel-btn left" onclick="prevCard()">&laquo;</button>
-
-    <!-- Carousel track -->
     <div class="carousel-track" id="carouselTrack"></div>
-
-    <!-- Right arrow button -->
     <button class="carousel-btn right" onclick="nextCard()">&raquo;</button>
   </div>
 
@@ -373,7 +276,6 @@
     </form>
   </div>
 
-  <!-- Existing Script -->
   <script>
     /************************************************************
      * 1. Carousel + Flip Cards Logic
@@ -389,25 +291,11 @@
       const maxIndex = Math.floor(totalCards - visibleCards);
       currentIndex = Math.min(currentIndex, maxIndex);
       currentIndex = Math.max(0, currentIndex);
-
       carouselTrack.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
-
-      if (currentIndex === maxIndex) {
-        carouselTrack.style.paddingRight = '50px';
-      } else {
-        carouselTrack.style.paddingRight = '0';
-      }
+      carouselTrack.style.paddingRight = (currentIndex === maxIndex) ? '50px' : '0';
     }
-
-    function nextCard() {
-      currentIndex++;
-      updateTransform();
-    }
-
-    function prevCard() {
-      currentIndex--;
-      updateTransform();
-    }
+    function nextCard() { currentIndex++; updateTransform(); }
+    function prevCard() { currentIndex--; updateTransform(); }
 
     /************************************************************
      * 2. Chat Logic
@@ -423,37 +311,22 @@
       chatMessages.appendChild(msg);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-
     function getOrCreateUserId() {
-        // Check if a user ID already exists in localStorage
-        let userId = localStorage.getItem("userId");
-
-        if (!userId) {
-            // If no user ID exists, create a new one
-            userId = generateUserId();
-            localStorage.setItem("userId", userId);
-        }
-
-        return userId;
+      let userId = localStorage.getItem("userId");
+      if (!userId) {
+        userId = "user-" + Math.random().toString(36).substring(2, 15);
+        localStorage.setItem("userId", userId);
+      }
+      return userId;
     }
-
-    function generateUserId() {
-        // Generate a simple random user ID (e.g., UUID or random string)
-        return "user-" + Math.random().toString(36).substring(2, 15);
-    }
-
-
     function sendMessage() {
       const userText = userInput.value.trim();
       const userId = getOrCreateUserId();
-
       if (!userText) return;
-      addMessage(userText, true); // Add user message
+      addMessage(userText, true);
       userInput.value = '';
-
       const lang = document.getElementById('langSelector').value;
-
-      // Show "typing" with animated dots
+      // Original "typing..." message with animated dots
       const typingMessage = document.createElement('div');
       typingMessage.classList.add('message', 'bot-message');
       typingMessage.innerHTML = `
@@ -467,34 +340,11 @@
       chatMessages.appendChild(typingMessage);
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      // Fetch the response from the server
       fetch(`/answer-question?question=${encodeURIComponent(userText)}&language=${encodeURIComponent(lang)}&user_id=${encodeURIComponent(userId)}`)
         .then((res) => res.json())
         .then((data) => {
-          chatMessages.removeChild(typingMessage); // Remove "typing..." message
-
-          if (data.freeTextAnswer) {
-            addMessage(data.freeTextAnswer, false);
-          }
-          else if (data.comparison) {
-            // Format "comparison" key content
-            data.comparison.forEach((item) => {
-              const comparisonMessage = `
-                <div class="message bot-message">
-                  <strong>${item.name}</strong>
-                  <p>${item.details}</p>
-                </div>
-              `;
-              chatMessages.innerHTML += comparisonMessage;
-            });
-          } else if (data.answer) {
-            // Handle standard answers
-            addMessage(data.answer, false);
-          } else {
-            // Handle unexpected responses
-            addMessage("Sorry, I couldn't understand the response.", false);
-          }
-
+          chatMessages.removeChild(typingMessage);
+          addMessage(data);
           chatMessages.scrollTop = chatMessages.scrollHeight;
         })
         .catch((err) => {
@@ -505,7 +355,7 @@
     }
 
     /************************************************************
-     * 3. Language Switcher (Chat Header)
+     * 3. Language Switcher (Chat Header & Button Text)
      ************************************************************/
     const chatHeader = document.getElementById('chatHeader');
     const title = document.getElementById('title');
@@ -515,41 +365,40 @@
         userInput.placeholder = "Type your question";
         submitButton.innerText = "Send";
         title.textContent = "🇩🇪 🇩🇪 Wahlkumpel - your friendly assistant in reading electoral PDFs! 🇩🇪 🇩🇪";
-      }
-      else if (lang === 'German') {
+      } else if (lang === 'German') {
         chatHeader.textContent = "Frag mich!";
         userInput.placeholder = "Gib deine Frage ein";
         submitButton.innerText = "Sende";
         title.textContent = "🇩🇪 🇩🇪 Wahlkumpel – dein freundlicher Helfer beim Lesen von Wahl-PDFs! 🇩🇪 🇩🇪";
       }
     }
+    function updateLanguage() {
+      const lang = document.getElementById('langSelector').value;
+      changeChatHeader(lang);
+      document.getElementById('loadQuestionsBtn').textContent =
+        (lang === 'English' ? 'Suggest questions!' : 'Fragen vorschlagen!');
+    }
 
     /************************************************************
-     * 4. Fetch Topics by Language
+     * 4. Fetch Topics (Triggered by Button Click)
      ************************************************************/
     function topicClicked(backText) {
       userInput.value = backText;
       window.scrollTo(0, document.body.scrollHeight);
       sendMessage();
     }
-
     function fetchTopics() {
       const lang = document.getElementById('langSelector').value;
-      changeChatHeader(lang);
-
       spinnerContainer.style.display = 'block';
-      carouselTrack.innerHTML = '';
+      carouselTrack.innerHTML = '';  // Clear previous cards (if any)
       currentIndex = 0;
       totalCards = 0;
-
       const url = `/topics?language=${encodeURIComponent(lang)}`;
-
       fetch(url)
         .then(res => res.json())
         .then(data => {
           const topics = data.topics || [];
           totalCards = topics.length;
-
           topics.forEach(item => {
             const card = document.createElement('div');
             card.className = 'flip-card';
@@ -561,15 +410,13 @@
                 <div class="flip-card-back">
                   <p>${item.backText}</p>
                 </div>
-              </div>
-            `;
+              </div>`;
             carouselTrack.appendChild(card);
           });
         })
         .catch(err => console.error('Error fetching topics:', err))
         .finally(() => {
           spinnerContainer.style.display = 'none';
-
           const firstCard = carouselTrack.querySelector('.flip-card');
           if (firstCard) {
             const style = window.getComputedStyle(firstCard);
@@ -585,7 +432,7 @@
     }
 
     /************************************************************
-     * 5. Collapsible Sidebar Logic
+     * 5. Collapsible Sidebar Logic (Restored)
      ************************************************************/
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
@@ -597,18 +444,15 @@
         document.body.classList.add('sidebar-open');
       }
     }
-
-    // Optional: Close the sidebar if user clicks outside of it
     window.onclick = function(event) {
       const sidebar = document.getElementById('sidebar');
       const openBtn = document.querySelector('.openbtn');
       if (sidebar.style.width === '250px' && !sidebar.contains(event.target) && event.target !== openBtn) {
         toggleSidebar();
       }
-    }
+    };
 
-    window.addEventListener('DOMContentLoaded', fetchTopics);
+    window.addEventListener('DOMContentLoaded', updateLanguage);
   </script>
-
 </body>
 </html>

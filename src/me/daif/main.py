@@ -9,8 +9,6 @@ from me.daif.agent.kumpel import answer_question
 from me.daif.agent.language import SupportedLanguage
 from me.daif.agent.response_schema import (
     most_important_topics_parser,
-    structured_comparison_parser,
-    free_text_answer_parser,
 )
 
 security = HTTPBasic()
@@ -20,7 +18,7 @@ templates = Jinja2Templates(directory="templates")
 
 
 # Maps a user id -> ${language}: list[chat history items (both question and answer)]
-chat_history = defaultdict(lambda: defaultdict(list))
+state = defaultdict(lambda: defaultdict(list))
 
 
 @app.get("/health")
@@ -47,6 +45,7 @@ async def most_important_topics(
         1. The item name (like healthcare, pension, ...etc).
         2. description: A text that says: Make a comparison between the stances of all parties on <the item name from step 1>.
         Answer both points in the {language} language, and use friendly non-official tone.
+        Make it very short an concise.
         Provide the output in the following JSON format:
         {most_important_topics_parser.get_format_instructions()}
     """
@@ -91,20 +90,15 @@ async def answer_user_question(user_id: str, language: str, question: str):
     5. FDP: also known as "Freie Demokratische Partei", also known as "Free Democratic Party".
     6. BÜNDNIS 90/DIE GRÜNEN: also known as "Die Grünen", also known as "Alliance 90/The Greens" also known as "The Greens".
     7. SPD: also known as "Social Democratic Party of Germany", also known as "Sozialdemokratische Partei Deutschlands".
-
-    If the question is about comparing the stances of different parties, represent the output in the following json schema (keep in mind the details field is always a string):
-    {structured_comparison_parser.get_format_instructions()}
+    8. Volt.
     
-    Otherwise, represent the output in the following json schema (string Free text answer):
-    {free_text_answer_parser.get_format_instructions()}
-    
-    All serialized fields are either strings or list of strings. The field names are lower snake case and the field values
-    are translated.
+    Your answer should be nice to format in HTML form that could be used as is in the UI.
+    Never use markdown, only valid HTML.
     """
-    answer = await answer_question(question, language, chat_history[user_id][language])
-    chat_history[user_id][language].append(f"question: {question}, answer: {answer}")
 
-    if "comparison" in answer:
-        return structured_comparison_parser.parse(answer)
-    else:
-        return free_text_answer_parser.parse(answer)
+    answer = await answer_question(question, language, state[user_id]["chat_history"])
+
+    state[user_id]["chat_history"].append(("human", question))
+    state[user_id]["chat_history"].append(("ai", answer))
+
+    return answer

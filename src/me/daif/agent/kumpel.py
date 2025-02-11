@@ -1,107 +1,42 @@
-import os
-
+from langchain import hub
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains import create_history_aware_retriever
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_text_splitters import (
-    RecursiveCharacterTextSplitter,
-)
+from langchain_pinecone import PineconeVectorStore
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_community.vectorstores import FAISS
 
 from me.daif.agent.language import SupportedLanguage
 
-FAISS_INDEX_NAME = "local.db"
+INDEX_NAME = "wahlkumpel-2025"
 
 
 async def answer_question(
-    question: str, language: SupportedLanguage, chat_history: list[str]
-) -> str:
-    vectorstore = await _load_vectorstore()
+    query: str, language: SupportedLanguage, chat_history: list[tuple[str, str]]
+):
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    docsearch = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
+    chat = ChatOpenAI(verbose=True, temperature=0)
 
-    retriever = vectorstore.as_retriever(
-        search_type="mmr",
-        search_kwargs={"k": 30, "fetch_k": 60, "lambda_mult": 0.5},
-    )
+    retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
+    stuff_documents_chain = create_stuff_documents_chain(chat, retrieval_qa_chat_prompt)
 
-    llm = ChatOpenAI(temperature=0)
-
-    # Contextualize question
-    contextualize_q_system_prompt = (
-        "Given a chat history and the latest user question "
-        "which might reference context in the chat history, "
-        "formulate a standalone question which can be understood "
-        "without the chat history. Do NOT answer the question, just "
-        "reformulate it if needed and otherwise return it as is."
-    )
-    contextualize_q_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", contextualize_q_system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-        ]
-    )
+    rephrase_prompt = hub.pull("langchain-ai/chat-langchain-rephrase")
     history_aware_retriever = create_history_aware_retriever(
-        llm, retriever, contextualize_q_prompt
+        llm=chat,
+        retriever=docsearch.as_retriever(
+            search_type="mmr",
+            search_kwargs={"k": 30, "fetch_k": 60, "lambda_mult": 0.5},
+        ),
+        prompt=rephrase_prompt,
     )
-
-    qa_system_prompt = (
-        "You are an assistant for question-answering tasks. Use "
-        "the following pieces of retrieved context to answer the "
-        "question. If you don't know the answer, just say that you "
-        "don't know. Use three sentences maximum and keep the answer "
-        "concise."
-        "\n\n"
-        "{context}"
+    qa = create_retrieval_chain(
+        retriever=history_aware_retriever,
+        combine_docs_chain=stuff_documents_chain,
     )
-    qa_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", qa_system_prompt),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-        ]
-    )
-    question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
-    rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
-
-    question = f"""
-        {question}
-        Translate your answer in the {language} language.
+    query = f"""
+        {query}
+        
+        Your final answer should be in the {language} language.
     """
-    response = rag_chain.invoke({"input": question, "chat_history": chat_history})
-    answer = response["answer"]
-
-    return answer
-
-
-async def _load_vectorstore() -> FAISS:
-    embeddings = OpenAIEmbeddings()
-
-    if os.path.isdir(FAISS_INDEX_NAME):
-        return FAISS.load_local(
-            FAISS_INDEX_NAME,
-            embeddings,
-            allow_dangerous_deserialization=True,
-        )
-
-    documents = []
-    for file in os.listdir("documents"):
-        filename = os.fsdecode(file)
-        if filename.endswith(".pdf"):
-            party, _ = filename.split(".")
-            loader = PyPDFLoader(file_path=f"documents/{filename}")
-            party_documents = loader.load()
-            for doc in party_documents:
-                doc.metadata["party"] = party
-                documents.append(doc)
-            print(f"Loaded {file}")
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200,
-    )
-    documents = text_splitter.split_documents(documents=documents)
-    vectorstore = FAISS.from_documents(documents, embeddings)
-    vectorstore.save_local(FAISS_INDEX_NAME)
-    return vectorstore
+    result = qa.invoke(input={"input": query, "chat_history": chat_history})
+    return result["answer"]
