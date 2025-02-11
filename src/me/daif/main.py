@@ -1,10 +1,7 @@
-import secrets
 from collections import defaultdict
-from typing import Annotated
 
-from fastapi import FastAPI, Request, Depends, HTTPException
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from starlette import status
+from fastapi import FastAPI, Request
+from fastapi.security import HTTPBasic
 from starlette.responses import HTMLResponse
 from starlette.templating import Jinja2Templates
 
@@ -22,33 +19,8 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 
-USER = "wahlkumpelUser"
-PASS = "dcbb4290-94a3-4fb0-b982-1ea32dee65d5"
-
 # Maps a user id -> ${language}: list[chat history items (both question and answer)]
 chat_history = defaultdict(lambda: defaultdict(list))
-
-
-def check_credentials(
-    credentials: Annotated[HTTPBasicCredentials, Depends(security)],
-):
-    current_username_bytes = credentials.username.encode("utf8")
-    correct_username_bytes = USER.encode("utf-8")
-    is_correct_username = secrets.compare_digest(
-        current_username_bytes, correct_username_bytes
-    )
-    current_password_bytes = credentials.password.encode("utf8")
-    correct_password_bytes = PASS.encode("utf-8")
-    is_correct_password = secrets.compare_digest(
-        current_password_bytes, correct_password_bytes
-    )
-    if not (is_correct_username and is_correct_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
 
 
 @app.get("/health")
@@ -57,7 +29,7 @@ async def health():
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, _: Annotated[str, Depends(check_credentials)]):
+async def index(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
