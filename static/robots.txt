@@ -1,0 +1,10 @@
+# robots.txt for wahlkumpel.com
+# Mission: Assist voters in Germany in identifying the political party that best represents their views for the 2025 elections.
+# Languages: English and German.
+
+User-agent: *
+Disallow: /docs/
+Disallow: /redoc/
+
+Host: wahlkumpel.com
+Sitemap: https://wahlkumpel.com/sitemap.xml

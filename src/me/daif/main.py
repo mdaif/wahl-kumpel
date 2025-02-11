@@ -2,7 +2,8 @@ from collections import defaultdict
 
 from fastapi import FastAPI, Request
 from fastapi.security import HTTPBasic
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, FileResponse
+from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 from me.daif.agent.kumpel import answer_question
@@ -24,6 +25,19 @@ state = defaultdict(lambda: defaultdict(list))
 @app.get("/health")
 async def health():
     return {"status": "OK"}
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/robots.txt", include_in_schema=False)
+async def robots_txt():
+    return FileResponse("static/robots.txt", media_type="text/plain")
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+async def sitemap():
+    return FileResponse("static/sitemap.xml", media_type="application/xml")
 
 
 @app.get("/", response_class=HTMLResponse)
