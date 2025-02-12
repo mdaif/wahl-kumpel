@@ -106,7 +106,7 @@ async def answer_user_question(user_id: str, language: str, question: str):
     7. SPD: also known as "Social Democratic Party of Germany", also known as "Sozialdemokratische Partei Deutschlands".
     8. Volt.
     
-    Your answer should be nice to format in HTML form that could be used as is in the UI.
+    Your answer should be in valid proper looking HTML format that'll get displayed right in the FE.  
     Never use markdown, only valid HTML.
     """
 
