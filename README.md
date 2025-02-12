@@ -29,6 +29,7 @@ https://openai.com/index/openai-api/
 and then export an env variable
 ```shell
 OPENAI_API_KEY=...
+PINECONE_API_KEY=...
 ```
 
 You can then run either the dockerized version
